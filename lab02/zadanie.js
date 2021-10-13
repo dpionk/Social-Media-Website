@@ -22,5 +22,5 @@ ssh.connect({
 }).then(() => {
     ssh.execCommand(`cat ${ścieżka}`).then((result) => {
         console.log(result.stdout);
-    });
-}).catch(err => console.log(err))
+    }).catch(err => console.log("Nie ma takiego pliku"));
+}).catch(err => console.log("Problem z połączeniem"));
