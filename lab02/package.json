@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "paramiko": "^0.0.1"
+  }
+}
