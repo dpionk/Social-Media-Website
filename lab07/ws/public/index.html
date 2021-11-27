@@ -1,69 +1,34 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-  <title>WebSocket API</title>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" href="css/styl.css" />
-  <script src="js/jquery.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-</head>
-
-<body>
-  <pre id="messages" style="height: 400px; overflow: scroll"></pre>
-<input type="text" id="messageBox" placeholder="Napisz wiadomość" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
-<button id="send" style="width: 100%; height: 30px;">Wyślij</button>
-</body>
-<script>
-   (function() {
-    const sendBtn = document.querySelector('#send');
-    const messages = document.querySelector('#messages');
-    const messageBox = document.querySelector('#messageBox');
-
-    let ws;
-    
-    function showMessage(login, message) {
-      messages.textContent += `${login}\n\n${message}\n`;
-      messages.scrollTop = messages.scrollHeight;
-      messageBox.value = '';
-    } 
-    
-    let login= prompt("Podaj swój login");
-
-    if (login == null || login == "") {
-      showMessage("bot", "Połączenie nieudane, ponieważ musisz podać login. Odśwież stronę.")
-    }
-
-    else {
-    function init() {
-      if (ws) {
-        ws.onerror = ws.onopen = ws.onclose = null;
-        ws.close();
-      }
-
-      ws = new WebSocket('ws://localhost:3000');
-      ws.onopen = () => {
-        showMessage("bot", "Połączenie udane, możesz zacząć pisać\n")
-      }
-      ws.onmessage = ({ data }) => showMessage(login,data);
-      ws.onclose = function() {
-        ws = null;
-      }
-    }
-
-    sendBtn.onclick = function() {
-      if (!ws) {
-        showMessage("Brak połączenia");
-        return ;
-      }
-
-      ws.send(messageBox.value);
-      showMessage(login,messageBox.value);
-    }
-
-    init();
-  }
-})();
-  
-</script>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Chat</title>
+	</head>
+	<body>
+			<main>
+				<form action="chat.html">
+					<div>
+						<label for="login">Login</label>
+						<input
+							type="text"
+							name="login"
+							id="login"
+							placeholder="Podaj swój login"
+							required
+						/>
+					</div>
+					<div>
+						<label for="room">Pokoje</label>
+						<select name="room" id="room">
+							<option value="1">1</option>
+							<option value="2">2</option>
+						</select>
+					</div>
+					<button type="submit">Dołącz do pokoju</button>
+				</form>
+			</main>
+		</div>
+	</body>
 </html>
