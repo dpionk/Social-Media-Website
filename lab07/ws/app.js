@@ -2,6 +2,7 @@
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io')
+const { userJoin, getCurrentUser, userLeaves} = require('./utils/users')
 
 
 const app = express();
@@ -11,29 +12,48 @@ const io = socketio(server);
 
 app.use(express.static('public'));
 
+
+
+
+const formatMessage = (login,message) => {
+	return {
+		login,
+		message
+	}
+}
+
+
 io.on('connection', socket => {
-	console.log('Ktoś się połączył')
+
+	socket.on('joinRoom', ({ login, room }) => {
+
+	const user = userJoin(socket.id, login, room);
+	socket.join(user.room)
+
+	socket.emit('message', formatMessage('Bot', 'Witaj na chacie :)'))
+
+	//pokazanie innym userom, że ktoś się zalogował
+	socket.broadcast.to(user.room).emit('message', formatMessage('Bot', `${user.login} dołączył/a do chatu`));
+
+
+	});
+
+	
+	socket.on('chatMessage', (message) => {
+		const user = getCurrentUser(socket.id);
+		io.emit('message', formatMessage(user[0].login, message))
+	})
+
+	socket.on('disconnect', () => {
+		const user = userLeaves(socket.id);
+		//pokazanie innym userom, że ktoś wyszedł
+		if(user) {
+		io.emit('message', formatMessage('Bot',`${user.login} rozłączył/a się z chatu`));
+		}
+	})
+
 })
 
-// wss.on('connection', function connection(ws) {
-//     ws.on('message', function incoming(data) {
-//         wss.clients.forEach(function each(client) {
-//             if (client != ws && client.readyState == WebSocket.OPEN) {
-//                 client.send(data);
-                
-//             }
-//         })
-//     })
-// })
-
-//io.on('connection', client => {
-//    client.on('connect', data => {
-//        console.log("Someone just connected")
-//    })
-//    client.on('disconnect', () => {
-//        console.log("Someone just disconnected")
-//    })
-//})
 
 server.listen(3000, function () {
     console.log('Serwer HTTP działa na porcie 3000');

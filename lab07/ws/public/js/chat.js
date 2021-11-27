@@ -1,52 +1,35 @@
+//Pobranie loginu i pokoju z URL-a
+const { login, room } = Qs.parse(location.search, {
+	ignoreQueryPrefix: true
+});
+
 const socket = io();
 
-//function () {
-//    const sendBtn = document.querySelector('#send');
-//    const messages = document.querySelector('#messages');
-//    const messageBox = document.querySelector('#messageBox');
+socket.emit('joinRoom', { login, room });
 
-//    let ws;
+const chatForm = document.getElementById('chat-form')
+
+socket.on('message', object => {
+	showMessage(object)
+});
+
+//Wysyłanie wiadomości
+chatForm.addEventListener('submit', (event) => {
+	event.preventDefault();
+
+	const message = event.target.elements.message.value;
+	//Pokazanie wszystkim wiadomości
+	socket.emit('chatMessage', message)
+	
+})
+
+    const messages = document.querySelector('#messages');
+    const messageBox = document.querySelector('#message');
+
+
     
-//    function showMessage(login, message) {
-//      messages.textContent += `${login}\n\n${message}\n`;
-//      messages.scrollTop = messages.scrollHeight;
-//      messageBox.value = '';
-//    } 
-    
-//    let login= prompt("Podaj swój login");
-
-//    if (login == null || login == "") {
-//      showMessage("bot", "Połączenie nieudane, ponieważ musisz podać login. Odśwież stronę.")
-//    }
-
-//    else {
-//    function init() {
-//      if (ws) {
-//        ws.onerror = ws.onopen = ws.onclose = null;
-//        ws.close();
-//      }
-
-//      ws = new WebSocket('ws://localhost:3000');
-//      ws.onopen = () => {
-//        showMessage("bot", "Połączenie udane, możesz zacząć pisać\n")
-//      }
-//      ws.onmessage = ({ data }) => showMessage(login,data);
-//      ws.onclose = function() {
-//        ws = null;
-//      }
-//    }
-
-//    sendBtn.onclick = function() {
-//      if (!ws) {
-//        showMessage("Brak połączenia");
-//        return ;
-//      }
-
-//      ws.send(messageBox.value);
-//      showMessage(login,messageBox.value);
-//    }
-
-//    init();
-//  }
-//};
-  
+    const  showMessage = (object) => {
+      messages.textContent += `${object.login}\n\n${object.message}\n`;
+      messages.scrollTop = messages.scrollHeight;
+      messageBox.value = '';
+    } 
