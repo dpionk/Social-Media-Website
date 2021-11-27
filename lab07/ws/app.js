@@ -1,13 +1,19 @@
 'use strict';
-const connect = require("connect");
-const app = connect();
-const serveStatic = require('serve-static');
-const server = require("http").createServer(app);
-const io = require('socket.io')(server);
+const express = require('express');
+const http = require('http');
+const socketio = require('socket.io')
 
-const WebSocket = require("ws")
-const wss = new WebSocket.Server({ server })
-app.use(serveStatic("public"));
+
+const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
+
+
+app.use(express.static('public'));
+
+io.on('connection', socket => {
+	console.log('Ktoś się połączył')
+})
 
 // wss.on('connection', function connection(ws) {
 //     ws.on('message', function incoming(data) {
@@ -20,14 +26,14 @@ app.use(serveStatic("public"));
 //     })
 // })
 
-io.on('connection', client => {
-    client.on('connect', data => {
-        console.log("Someone just connected")
-    })
-    client.on('disconnect', () => {
-        console.log("Someone just disconnected")
-    })
-})
+//io.on('connection', client => {
+//    client.on('connect', data => {
+//        console.log("Someone just connected")
+//    })
+//    client.on('disconnect', () => {
+//        console.log("Someone just disconnected")
+//    })
+//})
 
 server.listen(3000, function () {
     console.log('Serwer HTTP działa na porcie 3000');
