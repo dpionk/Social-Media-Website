@@ -45,7 +45,7 @@ function Login({ setToken, setUser }) {
 	}
 
 	async function loginUser(credentials) {
-		axios.post('http://localhost:3001/login', credentials)
+		axios.post('http://localhost:3000/login', credentials)
 			.then((data) => {
 				console.log(data)
 				const now = new Date();

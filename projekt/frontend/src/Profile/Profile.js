@@ -12,7 +12,7 @@ function Profile({ActualUser}) {
 	const [user, setUser] = useState();
 
 	useEffect(() => {
-		axios.get(`http://localhost:3001/users/${id}`).then((response) => {
+		axios.get(`http://localhost:3000/users/${id}`).then((response) => {
 			console.log(response)
 			setUser(response.data.users)
 		}).catch(error => {

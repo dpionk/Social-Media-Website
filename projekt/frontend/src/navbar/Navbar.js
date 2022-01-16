@@ -17,7 +17,7 @@ function Navbar({user}) {
 	const logout = () => {
 		localStorage.clear();
 		Cookies.remove('token')
-		window.location.href = "/login";
+		window.location.href = "/";
 	}
 	return (
 		<div>
@@ -48,7 +48,7 @@ function Navbar({user}) {
 								</Link>
 							</li>
 							<li className='nav-item'>
-							<Link to="/logout" style={{ textDecoration: 'none' }}>
+							<Link to="/" style={{ textDecoration: 'none' }}>
 							<button onClick={logout} className="nav-link">
 									Wyloguj się
 								</button>
