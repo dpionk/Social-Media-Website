@@ -1,0 +1,121 @@
+@import "~bootstrap/scss/bootstrap";
+
+.person {
+  .list-group-detailed {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 20px;
+    .list-group-item {
+      display: flex;
+      gap: 30px;
+      padding: 20px;
+
+      .img {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        img {
+          height: 350px;
+          width: 300px;
+        }
+      }
+
+      .info-buttons {
+        display: flex;
+        flex-direction: column;
+
+        .buttons {
+          display: flex;
+          flex-direction: row-reverse;
+          gap: 20px;
+          button {
+            background-color: $blue-300;
+            color: white;
+
+            &:hover {
+              color: white;
+            }
+          }
+        }
+        .ta {
+          display: flex;
+          flex-direction: column;
+          .user-back {
+            display: flex;
+            justify-content: space-between;
+            .user {
+              justify-content: justify;
+              font-weight: bold;
+              font-size: 2.5em;
+            }
+            .button-back {
+              button {
+                background-color: $blue-300;
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media (min-width: 768px) {
+  .person {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .list-group-detailed {
+      justify-content: center;
+      .info-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .ta {
+        justify-content: justify;
+      }
+    }
+  }
+}
+@media (max-width: 767px) {
+  .person {
+    .list-group-detailed {
+
+
+      .list-group-item {
+        border-radius: 20px;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+
+        .img {
+          gap: 5px;
+          img {
+            height: 150px;
+            width: 100px;
+          }
+        }
+        .info-buttons {
+          align-items: center;
+          gap: 20px;
+
+          .ta {
+            align-items: center;
+            text-align: center;
+            max-width: 100%;
+
+            .user-back {
+              flex-direction: column-reverse;
+              .user {
+                font-size: 2em;
+                max-width: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
