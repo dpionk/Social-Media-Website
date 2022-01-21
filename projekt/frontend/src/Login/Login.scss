@@ -1,0 +1,20 @@
+@import "~bootstrap/scss/bootstrap";
+
+.list-group-item {
+	.forms {
+		display:flex;
+		align-items: flex-start;
+		justify-content: space-around;
+	}
+	.form {
+		padding:20px;
+		border-radius:20px;
+		border: 1px solid black;
+
+		form {
+			display:flex;
+			flex-direction: column;
+			gap:20px;
+		}
+	}
+}

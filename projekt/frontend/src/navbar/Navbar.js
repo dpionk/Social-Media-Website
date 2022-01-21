@@ -17,6 +17,7 @@ function Navbar({user}) {
 	const logout = () => {
 		localStorage.clear();
 		Cookies.remove('token')
+		Cookies.remove('user')
 		window.location.href = "/";
 	}
 	return (
@@ -38,7 +39,7 @@ function Navbar({user}) {
 								</Link>
 							</li>
 							<li className='nav-item'>
-								<Link to={ user ? `/users/${user.id}` : '/'} style={{ textDecoration: 'none' }}>
+								<Link to={ user ? `/users/${user}` : '/'} style={{ textDecoration: 'none' }}>
 									<div className="nav-link">Twój profil</div>
 								</Link>
 							</li>
