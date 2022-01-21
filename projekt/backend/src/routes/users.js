@@ -66,4 +66,49 @@ router.post('/', async (req, res) => {
     return res.send(insertedUser);  
 });
 
+
+router.put('/:id', async  (req, res) => {
+	const id = req.params.id;
+
+	const result = await client.query(`UPDATE users SET picture = $1 WHERE id = $2`,
+	[req.body.picture, id]
+);
+
+	return result.rowCount > 0 ? res.send('Updated') : res.sendStatus(400);
+})
+
+router.put('/password/:username', async (req, res) => {
+
+	const userRows = await client.query("SELECT * FROM users WHERE username = $1", [req.params.username]);
+	const user = userRows.rows[0]; 
+	if(!user) {
+        return res.sendStatus(400);
+    }
+
+	else if (passwordHash.verify(req.body.Oldpassword, user.userpassword)) {
+		const result = await client.query(`UPDATE users SET userpassword = $1 WHERE username = $2`,
+	[req.body.Newpassword, req.params.username]
+);
+
+	return res.send('Updated')
+	}
+
+	else {
+		res.status(500).send(messages.USER_DOES_NOT_EXIST)
+	}
+
+})
+
+router.delete('/:id', async  (req, res) => {
+	const id = req.params.id;
+
+	await client.query("DELETE from post WHERE creator = $1", [id])
+	await client.query("DELETE from post_comments WHERE person_id = $1", [id])
+
+    const response = await client.query("DELETE from users WHERE id = $1", [id]);
+
+    return response.rowCount > 0 ? res.sendStatus(200) : res.sendStatus(400); 
+})
+
+
 module.exports = router;

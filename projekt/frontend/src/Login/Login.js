@@ -49,7 +49,6 @@ function Login({ setToken, setUser }) {
 
 		axios.post('http://localhost:5000/users/login', credentials)
 			.then((data) => {
-				console.log(data)
 				const now = new Date();
 				now.setTime(now.getTime() + (60 * 1000));
 				setToken(data.data.token ? data.data.token : undefined);
@@ -62,11 +61,11 @@ function Login({ setToken, setUser }) {
 	}
 
 	async function createUser(values) {
-		axios.post('http://localhost:5000/users/', values).then((data) => {
-			console.log(data)
+		axios.post('http://localhost:5000/users/', values).then(() => {
 			alert('Zarejestrowano! Możesz się już zalogować.')
 		})
-			.catch((error) => { console.log(error); alert('Coś poszło nie tak') })
+			.catch((error) => { 
+				if (error.message === "Network Error") {alert('Coś poszło nie tak')} else { alert('Istnieje już użytkownik o takiej nazwie')} })
 	}
 	return (
 		<div className='login'>

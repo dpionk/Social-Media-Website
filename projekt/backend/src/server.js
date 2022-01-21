@@ -3,6 +3,7 @@ const app = express();
 const client = require('./config/psqlClient');
 const users = require('./routes/users');
 const posts = require('./routes/posts');
+const comments = require('./routes/comments');
 //const cors = require('cors');
 
 //const path = require('path')
@@ -24,6 +25,7 @@ app.use(function (req, res, next) {
 //app.use(express.static(path.join(__dirname,'build')));
 app.use('/users', users);
 app.use('/posts', posts);
+app.use('/comments', comments);
 
 //app.get('/', (req, res) => {
 //	res.sendFile(path.join(__dirname, 'build', 'index.html'));
@@ -40,7 +42,8 @@ client
 	username VARCHAR(60) NOT NULL,
 	userpassword VARCHAR(60) NOT NULL,
     first_name VARCHAR(60) NOT NULL,
-    last_name VARCHAR(60) NOT NULL
+    last_name VARCHAR(60) NOT NULL,
+	picture VARCHAR NULL
   );
 
   CREATE TABLE IF NOT EXISTS post (
