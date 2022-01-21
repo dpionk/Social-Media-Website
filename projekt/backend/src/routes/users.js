@@ -58,8 +58,8 @@ router.post('/', async (req, res) => {
     }
 
 	const insertedUserRows = await client.query(
-        "INSERT INTO users (username, userpassword, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING *",
-        [userToAdd.username, hashedPassword, userToAdd.first_name, userToAdd.last_name]
+        "INSERT INTO users (username, role, userpassword, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [userToAdd.username, 'default', hashedPassword, userToAdd.first_name, userToAdd.last_name]
       );
 
     const insertedUser = insertedUserRows.rows[0];

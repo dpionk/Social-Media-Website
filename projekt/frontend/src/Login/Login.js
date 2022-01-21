@@ -52,7 +52,7 @@ function Login({ setToken, setUser }) {
 				console.log(data)
 				const now = new Date();
 				now.setTime(now.getTime() + (60 * 1000));
-				setToken(data.data.token ? data.data.token : undefined); 
+				setToken(data.data.token ? data.data.token : undefined);
 				Cookies.set('token', data.data.token, { expires: now });
 				Cookies.set('user', data.data.user.id, { expires: now });
 				setUser(data.data.user.id)
@@ -66,79 +66,80 @@ function Login({ setToken, setUser }) {
 			console.log(data)
 			alert('Zarejestrowano! Możesz się już zalogować.')
 		})
-		.catch((error) => { console.log(error); alert('Coś poszło nie tak') })
+			.catch((error) => { console.log(error); alert('Coś poszło nie tak') })
 	}
 	return (
-		<div className='list-group-item'>
+		<div className='login'>
 			<div>
 				<h4>Witamy na naszym portalu społecznościowym!</h4>
 			</div>
-			<div className='forms'>
-				<div className='form'>
-					<form onSubmit={handleSubmitLogin}>
-						<h4>Zaloguj się</h4>
-						<div className="form-group">
-							<label>Login</label>
-							<input type="text" className="form-control" placeholder="podaj swoją nazwę użytkownika" onChange={e => setUserName(e.target.value)} />
-						</div>
-						<div className="form-group">
-							<label>Hasło</label>
-							<input type="password" className="form-control" placeholder="hasło" onChange={e => setPassword(e.target.value)} />
-						</div>
-						<button type="submit" className="btn btn-primary">Zatwierdź</button>
-					</form>
-				</div>
-				<div className='form'>
-					<Formik
-						enableReinitialize
-						validate={handleValidateRegister}
-						onSubmit={handleSubmitRegister}
-						initialValues={
-							{
-								username: '',
-								password: '',
-								first_name: '',
-								last_name: ''
+			<div className='list-group-item'>
+				<div className='forms'>
+					<div className='form'>
+						<form onSubmit={handleSubmitLogin}>
+							<h4>Zaloguj się</h4>
+							<div className="form-group">
+								<label>Login</label>
+								<input type="text" className="form-control" placeholder="podaj swoją nazwę użytkownika" onChange={e => setUserName(e.target.value)} />
+							</div>
+							<div className="form-group">
+								<label>Hasło</label>
+								<input type="password" className="form-control" placeholder="hasło" onChange={e => setPassword(e.target.value)} />
+							</div>
+							<button type="submit" className="btn btn-primary">Zatwierdź</button>
+						</form>
+					</div>
+					<div className='form'>
+						<Formik
+							enableReinitialize
+							validate={handleValidateRegister}
+							onSubmit={handleSubmitRegister}
+							initialValues={
+								{
+									username: '',
+									password: '',
+									first_name: '',
+									last_name: ''
+								}
 							}
-						}
-					>
-						{
-							(formProps) => (
-								<form>
-									<h4>Zarejestruj się</h4>
-									<div className="form-group">
-										<label>Login</label>
-										<Field type='text' className='form-control' name='username' placeholder='podaj login' >
-										</Field>
-										{formProps.touched.username && formProps.errors.username ? <div>{formProps.errors.username}</div> : null}
-									</div>
-									<div className="form-group">
-										<label>Hasło</label>
-										<Field type='password' className='form-control' name='password' placeholder='hasło' >
-										</Field>
-										{formProps.touched.first_name && formProps.errors.password ? <div>{formProps.errors.password}</div> : null}
-									</div>
-									<div className="form-group">
-										<label>Imię (imiona)</label>
-										<Field type='text' className='form-control' name='first_name' placeholder='imię' >
-										</Field>
-										{formProps.touched.first_name && formProps.errors.first_name ? <div>{formProps.errors.first_name}</div> : null}
-									</div>
-									<div className="form-group">
-										<label>Nazwisko</label>
-										<Field type='text' className='form-control' name='last_name' placeholder='nazwisko' >
-										</Field>
-										{formProps.touched.last_name && formProps.errors.last_name ? <div>{formProps.errors.last_name}</div> : null}
-									</div>
-									<button type="button" className="btn btn-primary" onClick={formProps.handleSubmit}>Zatwierdź</button>
-								</form>
-							)
-						}
-					</Formik>
+						>
+							{
+								(formProps) => (
+									<form>
+										<h4>Zarejestruj się</h4>
+										<div className="form-group">
+											<label>Login</label>
+											<Field type='text' className='form-control' name='username' placeholder='podaj login' >
+											</Field>
+											{formProps.touched.username && formProps.errors.username ? <div>{formProps.errors.username}</div> : null}
+										</div>
+										<div className="form-group">
+											<label>Hasło</label>
+											<Field type='password' className='form-control' name='password' placeholder='hasło' >
+											</Field>
+											{formProps.touched.first_name && formProps.errors.password ? <div>{formProps.errors.password}</div> : null}
+										</div>
+										<div className="form-group">
+											<label>Imię (imiona)</label>
+											<Field type='text' className='form-control' name='first_name' placeholder='imię' >
+											</Field>
+											{formProps.touched.first_name && formProps.errors.first_name ? <div>{formProps.errors.first_name}</div> : null}
+										</div>
+										<div className="form-group">
+											<label>Nazwisko</label>
+											<Field type='text' className='form-control' name='last_name' placeholder='nazwisko' >
+											</Field>
+											{formProps.touched.last_name && formProps.errors.last_name ? <div>{formProps.errors.last_name}</div> : null}
+										</div>
+										<button type="button" className="btn btn-primary" onClick={formProps.handleSubmit}>Zatwierdź</button>
+									</form>
+								)
+							}
+						</Formik>
+					</div>
 				</div>
 			</div>
 		</div>
-
 	);
 }
 

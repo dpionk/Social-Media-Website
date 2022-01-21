@@ -6,7 +6,8 @@ import Login from './Login/Login';
 import Profile from './Profile/Profile'
 import Main from './Main/Main';
 import Chatrooms from './Chatrooms/Chatrooms';
-
+import Post from './Post/Post';
+import './App.scss'
 
 
 function App() {
@@ -23,8 +24,9 @@ function App() {
 				<Navbar user={user}/>
 				<div className='container'>
 					<Routes>
-						<Route exact path='/users/:id' element={<Profile ActualUser={user}/>}/>
-						<Route exact path='/' element={<Main/>}></Route>
+						<Route exact path='/users/:id' element={<Profile/>}/>
+						<Route exact path='/users/:id/posts/:postId' element={<Post/>}></Route>
+						<Route exact path='/' element={<Main user={user}/>}></Route>
 						<Route exact path='/chatrooms' element={<Chatrooms/>}></Route>
 					</Routes>
 				</div>
