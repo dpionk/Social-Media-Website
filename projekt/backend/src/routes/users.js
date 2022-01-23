@@ -78,17 +78,18 @@ router.put('/:id', async  (req, res) => {
 	return result.rowCount > 0 ? res.send('Updated') : res.sendStatus(400);
 })
 
-router.put('/password/:username', async (req, res) => {
+router.put('/password/:id', async (req, res) => {
 
-	const userRows = await client.query("SELECT * FROM users WHERE username = $1", [req.params.username]);
+	const userRows = await client.query("SELECT * FROM users WHERE user_id = $1", [req.params.id]);
 	const user = userRows.rows[0]; 
 	if(!user) {
         return res.sendStatus(400);
     }
 
 	else if (passwordHash.verify(req.body.Oldpassword, user.userpassword)) {
-		const result = await client.query(`UPDATE users SET userpassword = $1 WHERE username = $2`,
-	[req.body.Newpassword, req.params.username]
+		const hashedPassword = passwordHash.generate(req.body.Newpassword)
+		const result = await client.query(`UPDATE users SET userpassword = $1 WHERE user_id = $2`,
+	[hashedPassword, req.params.id]
 );
 
 	return res.send('Updated')
@@ -100,15 +101,21 @@ router.put('/password/:username', async (req, res) => {
 
 })
 
+
+//SELECT * FROM post_comments pc RIGHT JOIN users u ON u.user_id = pc.person_id WHERE pc.commented_post_id = $1", [req.params.idPost]
+
+
 router.delete('/:id', async  (req, res) => {
 	const id = req.params.id;
 
-	await client.query("DELETE from post WHERE creator = $1", [id])
+	//await client.query("DELETE pc FROM post_comments pc INNER JOIN post p ON p.post_id = pc.commented_post_id WHERE creator = $1", [id])
+
 	await client.query("DELETE from post_comments WHERE person_id = $1", [id])
+	await client.query("DELETE from post WHERE creator = $1", [id])
 
     const response = await client.query("DELETE from users WHERE user_id = $1", [id]);
 
-	console.log(response)
+
     return response.rowCount > 0 ? res.sendStatus(200) : res.sendStatus(400); 
 })
 
