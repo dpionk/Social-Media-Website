@@ -108,8 +108,13 @@ router.put('/password/:id', async (req, res) => {
 router.delete('/:id', async  (req, res) => {
 	const id = req.params.id;
 
-	//await client.query("DELETE pc FROM post_comments pc INNER JOIN post p ON p.post_id = pc.commented_post_id WHERE creator = $1", [id])
+	result = await client.query("SELECT * from post WHERE creator = $1", [id])
 
+
+	for (let row in result.rows) {
+		console.log(result.rows[row])
+		await client.query("DELETE from post_comments WHERE commented_post_id = $1", [result.rows[row].post_id])
+	}
 	await client.query("DELETE from post_comments WHERE person_id = $1", [id])
 	await client.query("DELETE from post WHERE creator = $1", [id])
 
