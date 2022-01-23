@@ -1,9 +1,10 @@
+import Cookies from 'js-cookie';
 import { useState, useEffect } from 'react';
 import { Formik, Field } from 'formik';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import { GrUserAdmin } from 'react-icons/gr'
-import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
+import {  AiFillEdit, AiFillDelete } from 'react-icons/ai'
 import axios from 'axios';
 import './Profile.scss'
 
@@ -13,22 +14,19 @@ function Profile({ userSession }) {
 	const history = useNavigate();
 
 
-	const [editingPost, setEditingPost] = useState(false);
 	const [user, setUser] = useState();
 	const [posts, setPosts] = useState();
 	const [showAddPicture, setShowAddPicture] = useState(false);
 
-	const deletePost = (id) => {
-		axios.delete(`http://localhost:5000/posts/${id}`).then(() => {
-			downloadPosts();
-			alert('Usunięto')
-		}).catch(error => {
-			console.log(error)
-			alert('Coś poszło nie tak')
-		}).finally(() => {
-			//setLoading(false);
-		})
+
+	const logout = () => {
+		localStorage.clear();
+		Cookies.remove('token')
+		Cookies.remove('user')
+		window.location.href = "/";
 	}
+
+
 	const downloadUser = () => {
 		axios.get(`http://localhost:5000/users/${id}`).then((response) => {
 			setUser(response.data)
@@ -48,6 +46,18 @@ function Profile({ userSession }) {
 			//setLoading(false);
 		})
 	}
+
+	const deleteUser = () => {
+		axios.delete(`http://localhost:5000/users/${userSession}`).then(() => {
+			alert('Usunięto profil :(')
+			logout();
+		}).catch(error => {
+			console.log(error)
+		}).finally(() => {
+			//setLoading(false);
+		})
+	}
+
 	useEffect(() => {
 		downloadUser();
 		downloadPosts();
@@ -57,7 +67,7 @@ function Profile({ userSession }) {
 	);
 
 	const handleSubmit = async (values) => {
-		await axios.put(`http://localhost:5000/users/${id}`, values).then((response) => {
+		await axios.put(`http://localhost:5000/users/${id}`, values).then(() => {
 			downloadUser();
 			setShowAddPicture(false);
 			alert('Udało się');
@@ -77,7 +87,7 @@ function Profile({ userSession }) {
 					<div className="list-group-item">
 						<div className="img">
 							<img src={user.picture ? user.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt="" />
-							<button className="btn" type="button" onClick={() => setShowAddPicture(!showAddPicture)}><AiFillEdit /></button>
+							{parseInt(userSession) === user.user_id ? <button className="btn" type="button" onClick={() => setShowAddPicture(!showAddPicture)}><AiFillEdit /></button> : null}
 							{showAddPicture ? <div className='form'>
 								<Formik
 									enableReinitialize
@@ -112,6 +122,7 @@ function Profile({ userSession }) {
 										{user.username} {user.role === 'admin' ? <GrUserAdmin /> : null}
 									</div>
 									<div className="button-back">
+									{parseInt(userSession) === user.user_id ? <button className="btn" type="button" onClick={deleteUser}><AiFillDelete /></button> : null}
 										<button className="btn" type="button" onClick={() => { history(-1); }}><RiArrowGoBackLine /></button>
 									</div>
 								</div>
@@ -120,6 +131,7 @@ function Profile({ userSession }) {
 								</div>
 							</div>
 						</div>
+						
 					</div>
 					<div className="list-group-item">
 						<div className='posts'>
@@ -130,12 +142,10 @@ function Profile({ userSession }) {
 								<ul>
 									{posts.map((post) => {
 										return (
-											<li className='post' key={post.id}>
+											<li className='post' key={post.post_id}>
 												<div className='edit-post'>
-													<div className='title'><Link to={`/posts/${post.id}`} style={{ textDecoration: 'none', color: 'black' }}>{post.title}</Link></div>
+													<div className='title'><Link to={`/posts/${post.post_id}`} style={{ textDecoration: 'none', color: 'black' }}>{post.title}</Link></div>
 													<div>
-													{parseInt(userSession) === user.id ? <button className="btn" type="button" onClick={() => {setEditingPost(!editingPost)}}><AiFillEdit /></button> : null}
-													{parseInt(userSession) === user.id ? <button className="btn" type="button" onClick={() => {deletePost(post.id)}}><AiFillDelete /></button> : null}
 													</div>
 												</div>
 
@@ -146,6 +156,7 @@ function Profile({ userSession }) {
 								</ul>
 							</div>
 						</div>
+						
 					</div>
 				</div>
 			}

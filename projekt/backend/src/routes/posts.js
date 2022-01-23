@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
 
 
 router.get('/:id', async (req,res) => {
-	const posts = await client.query("SELECT * FROM post WHERE id = $1", [parseInt(req.params.id)])
+	const posts = await client.query("SELECT * FROM post WHERE post_id = $1", [parseInt(req.params.id)])
 	return res.send(posts.rows)
 })
 
@@ -34,7 +34,7 @@ router.get('/author/:id', async (req,res) => {
 router.put('/:id', async  (req, res) => {
 	const id = req.params.id;
 
-	const result = await client.query(`UPDATE post SET title = $1, post_content = $2 WHERE id = $3`,
+	const result = await client.query(`UPDATE post SET title = $1, post_content = $2 WHERE post_id = $3`,
 	[req.body.title, req.body.post_content, id]
 );
 
@@ -44,7 +44,8 @@ router.put('/:id', async  (req, res) => {
 
 router.delete('/:id', async (req,res) => {
 	const id = req.params.id;
-    const response = await client.query("DELETE from post WHERE id = $1", [id]);
+	await client.query("DELETE from post_comments WHERE commented_post_id = $1", [id]);
+    const response = await client.query("DELETE from post WHERE post_id = $1", [id]);
 
     return response.rowCount > 0 ? res.sendStatus(200) : res.sendStatus(400); 
 })

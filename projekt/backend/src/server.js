@@ -37,7 +37,7 @@ client
   console.log('Connected to PostgreSQL');
 
   client.query(`CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
+    user_id SERIAL PRIMARY KEY,
 	role VARCHAR NOT NULL,
 	username VARCHAR(60) NOT NULL,
 	userpassword VARCHAR(60) NOT NULL,
@@ -47,21 +47,21 @@ client
   );
 
   CREATE TABLE IF NOT EXISTS post (
-    id SERIAL PRIMARY KEY,
+    post_id SERIAL PRIMARY KEY,
     title VARCHAR NOT NULL,
     release_date DATE NOT NULL,
     post_content VARCHAR NOT NULL,
     creator INTEGER NULL, 
-    FOREIGN KEY (creator) REFERENCES users (id)
+    FOREIGN KEY (creator) REFERENCES users (user_id)
   );
 
   CREATE TABLE IF NOT EXISTS post_comments (
-    id SERIAL PRIMARY KEY,
+    comment_id SERIAL PRIMARY KEY,
    	comment_content VARCHAR NOT NULL,
-    post_id INTEGER NOT NULL,
+    commented_post_id INTEGER NOT NULL,
     person_id INTEGER NOT NULL, 
-    FOREIGN KEY (person_id) REFERENCES users (id),
-    FOREIGN KEY (post_id) REFERENCES post (id)
+    FOREIGN KEY (person_id) REFERENCES users (user_id),
+    FOREIGN KEY (commented_post_id) REFERENCES post (post_id)
   );
 
   INSERT INTO users (username, role, userpassword, first_name, last_name) VALUES ('admin123', 'admin', 'sha1$3b1e2197$1$b9c5f33b4373a48531bf52162e9908746ed83a13', 'admin', 'adminowski');

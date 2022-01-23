@@ -53,8 +53,8 @@ function Login({ setToken, setUser }) {
 				now.setTime(now.getTime() + (60 * 1000));
 				setToken(data.data.token ? data.data.token : undefined);
 				Cookies.set('token', data.data.token, { expires: now });
-				Cookies.set('user', data.data.user.id, { expires: now });
-				setUser(data.data.user.id)
+				Cookies.set('user', data.data.user.user_id, { expires: now });
+				setUser(data.data.user.user_id)
 				alert('Zalogowano')
 			})
 			.catch((error) => { console.log(error); alert('Podano błędne dane') })

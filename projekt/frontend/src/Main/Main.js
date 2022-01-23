@@ -1,7 +1,8 @@
 import { Formik, Field } from 'formik';
+import './Main.scss'
 import axios from 'axios';
 
-function Main({user}) {
+function Main({ user }) {
 
 	const handleValidate = (values) => {
 		const errors = {}
@@ -71,12 +72,18 @@ function Main({user}) {
 					</Formik>
 				</div>
 			</div>
-			<div className='list-group-item'>
-				<div>
-					Aktywni użytkownicy
+			<div className='active-feed'>
+				<div className='activeUsers list-group-item'>
+						<h4>Aktywni użytkownicy</h4>
+					<div>
+						fgfdg
+					</div>
 				</div>
-				<div>
-					fgfdg
+				<div className='feed list-group-item'>
+						<h4>Najnowsze posty</h4>
+					<div>
+						fgfdg
+					</div>
 				</div>
 			</div>
 		</div>

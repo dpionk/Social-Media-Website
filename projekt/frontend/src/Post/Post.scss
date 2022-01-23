@@ -1,0 +1,83 @@
+@import "~bootstrap/scss/bootstrap";
+
+.post-container {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+
+  .form {
+    border: 1px solid gray;
+    border-radius: 20px;
+    padding: 20px;
+    background-color: white;
+
+    form {
+
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+  .post-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    .comments {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid gray;
+      border-radius: 20px;
+      padding: 20px;
+      background-color: white;
+
+      .title {
+        font-size: 1.2em;
+        font-style: italic;
+        font-weight: bold;
+		display:flex;
+		justify-content: space-between;
+      }
+
+      .comment {
+        padding: 20px;
+        border: 1px solid rgb(173, 167, 167);
+        border-radius: 20px;
+		display:flex;
+		flex-direction: column;
+		gap:20px;
+
+
+		img {
+			width:70px;
+			height: 70px;
+			border-radius: 50%;
+		}
+
+		.img-author {
+			 display: flex;
+			 justify-content: space-between;
+		}
+      }
+    }
+    .post {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid gray;
+      border-radius: 20px;
+      padding: 20px;
+      background-color: white;
+
+      .edit-post {
+        display: flex;
+        justify-content: space-between;
+        .title {
+          font-size: 1.2em;
+          font-style: italic;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

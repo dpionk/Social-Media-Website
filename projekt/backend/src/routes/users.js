@@ -23,6 +23,7 @@ router.post('/login',async  (req, res) => {
 
 	const userRows = await client.query("SELECT * FROM users WHERE username = $1", [req.body.username]);
 	const user = userRows.rows[0]; 
+
 	if(!user) {
         return res.status(500).send(messages.USER_DOES_NOT_EXIST);
     }
@@ -38,7 +39,7 @@ router.post('/login',async  (req, res) => {
 
 router.get('/:id', async  (req, res) => {
 	const id = req.params.id;
-	const userRows = await client.query("SELECT * FROM users WHERE id = $1", [id]); 
+	const userRows = await client.query("SELECT * FROM users WHERE user_id = $1", [id]); 
 	const user = userRows.rows[0];
 
 	if(!user) {
@@ -70,7 +71,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async  (req, res) => {
 	const id = req.params.id;
 
-	const result = await client.query(`UPDATE users SET picture = $1 WHERE id = $2`,
+	const result = await client.query(`UPDATE users SET picture = $1 WHERE user_id = $2`,
 	[req.body.picture, id]
 );
 
@@ -105,8 +106,9 @@ router.delete('/:id', async  (req, res) => {
 	await client.query("DELETE from post WHERE creator = $1", [id])
 	await client.query("DELETE from post_comments WHERE person_id = $1", [id])
 
-    const response = await client.query("DELETE from users WHERE id = $1", [id]);
+    const response = await client.query("DELETE from users WHERE user_id = $1", [id]);
 
+	console.log(response)
     return response.rowCount > 0 ? res.sendStatus(200) : res.sendStatus(400); 
 })
 
