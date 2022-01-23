@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import './Navbar.scss'
 
 
-function Navbar({user}) {
+function Navbar({ user }) {
 
 	const [clicked, setClicked] = useState(false);
 
@@ -39,7 +39,7 @@ function Navbar({user}) {
 								</Link>
 							</li>
 							<li className='nav-item'>
-								<Link to={ user ? `/users/${user}` : '/'} style={{ textDecoration: 'none' }}>
+								<Link to={user ? `/users/${user}` : '/'} style={{ textDecoration: 'none' }}>
 									<div className="nav-link">Twój profil</div>
 								</Link>
 							</li>
@@ -48,14 +48,20 @@ function Navbar({user}) {
 									<div className="nav-link">Chaty</div>
 								</Link>
 							</li>
+
 							<li className='nav-item'>
-							<Link to="/" style={{ textDecoration: 'none' }}>
-							<button onClick={logout} className="nav-link">
-									Wyloguj się
-								</button>
+								<Link to="/settings" style={{ textDecoration: 'none' }}>
+									<div className="nav-link">Ustawienia</div>
 								</Link>
-								
 							</li>
+							<li className='nav-item'>
+								<Link to="/" style={{ textDecoration: 'none' }}>
+									<button onClick={logout} className="nav-link">
+										Wyloguj się
+									</button>
+								</Link>
+							</li>
+
 						</ul>
 					</div>
 				</div>

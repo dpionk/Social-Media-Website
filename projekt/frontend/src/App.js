@@ -8,6 +8,9 @@ import Profile from './Profile/Profile'
 import Main from './Main/Main';
 import Chatrooms from './Chatrooms/Chatrooms';
 import Post from './Post/Post';
+import Settings from './Settings/Settings';
+import PageNotFound from './PageNotFound/PageNotFound'
+
 import './App.scss'
 
 
@@ -40,6 +43,8 @@ function App() {
 						<Route exact path='/' element={<Main user={user}/>}></Route>
 						<Route exact path='/chatrooms' element={<Chatrooms  user={user}/>}></Route>
 						<Route exact path='/posts/:id' element={<Post user={user}/>}></Route>
+						<Route exact path='/settings' element={<Settings user={user}/>}></Route>
+						<Route path='*' element={<PageNotFound />} />
 					</Routes>
 				</div>
 			</div>

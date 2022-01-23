@@ -1,22 +1,31 @@
 @import "~bootstrap/scss/bootstrap";
 
 .main {
-	display:flex;
-	flex-direction: column;
-	gap:50px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
 
-
-	.active-feed {
-		display:flex;
-		gap: 50px; 
-		.activeUsers {
-			border-radius: 20px;
-			flex: 1;
+  .list-group-item {
+	border-radius: 20px;
+    .form {
+		form {
+			display:flex;
+			flex-direction: column;
+			gap:20px;
 		}
+    }
+  }
+  .active-feed {
+    display: flex;
+    gap: 50px;
+    .activeUsers {
+      border-radius: 20px;
+      flex: 1;
+    }
 
-		.feed {
-			border-radius: 20px;
-			flex:3;
-		}
-	}
+    .feed {
+      border-radius: 20px;
+      flex: 3;
+    }
+  }
 }
