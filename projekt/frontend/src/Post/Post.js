@@ -5,7 +5,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
 import './Post.scss'
 
-function Post({ user }) {
+function Post({ user, socket }) {
 
 	const history = useNavigate();
 	const [comments, setComments] = useState();
@@ -58,10 +58,12 @@ function Post({ user }) {
 	}
 
 	const handleSubmit = (values) => {
-		console.log(values)
 		axios.post(`http://localhost:5000/comments/${id}`, values).then(() => {
-			downloadComments();
-			alert('Dodano')
+			socket.emit('comment', values)
+
+			socket.on('comment', () => {
+				downloadComments();
+			})
 		}).catch(error => {
 			console.log(error)
 			alert('Coś poszło nie tak')
@@ -130,42 +132,42 @@ function Post({ user }) {
 							<div>
 							</div>
 						</div>
-						<div className='content'>{ !editingPost ? post.post_content : 
-						<div className='form'>
-						<Formik
-							enableReinitialize
-							//validate={handleValidate}
-							onSubmit={handleSubmitEditPost}
-							initialValues={
-								{	
-									title: post.title,
-									post_content: post.post_content
+						<div className='content'>{!editingPost ? post.post_content :
+							<div className='form'>
+								<Formik
+									enableReinitialize
+									//validate={handleValidate}
+									onSubmit={handleSubmitEditPost}
+									initialValues={
+										{
+											title: post.title,
+											post_content: post.post_content
 
-								}
-							}
-						>
-							{
-								(formProps) => (
-									<form>
-										<div className='form-group'>
-											<label>Edytuj posta</label>
-											<Field type='text' className='form-control' name='title' >
-												
-											</Field>
-											<Field type='text' as='textarea' className='form-control' name='post_content' >
-											</Field>
-											{formProps.touched.post_contentt && formProps.errors.post_content ? <div>{formProps.errors.post_content}</div> : null}
-										</div>
-										<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
-									</form>
-								)
-							}
-						</Formik>
-					</div>
-						
-						
-						
-						
+										}
+									}
+								>
+									{
+										(formProps) => (
+											<form>
+												<div className='form-group'>
+													<label>Edytuj posta</label>
+													<Field type='text' className='form-control' name='title' >
+
+													</Field>
+													<Field type='text' as='textarea' className='form-control' name='post_content' >
+													</Field>
+													{formProps.touched.post_contentt && formProps.errors.post_content ? <div>{formProps.errors.post_content}</div> : null}
+												</div>
+												<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
+											</form>
+										)
+									}
+								</Formik>
+							</div>
+
+
+
+
 						}</div>
 					</div>
 					<div className='comments'>

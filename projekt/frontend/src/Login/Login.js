@@ -7,7 +7,7 @@ import './Login.scss'
 
 
 
-function Login({ setToken, setUser }) {
+function Login({ setToken, setUser, activeUsers, setActiveUsers, socket }) {
 
 	const [username, setUserName] = useState();
 	const [password, setPassword] = useState();
@@ -54,10 +54,15 @@ function Login({ setToken, setUser }) {
 				setToken(data.data.token ? data.data.token : undefined);
 				Cookies.set('token', data.data.token, { expires: now });
 				Cookies.set('user', data.data.user.user_id, { expires: now });
-				setUser(data.data.user.user_id)
+				setUser(data.data.user.user_id);
+				socket.emit('active', data.data.user)
+				socket.on('active', data => {
+					setActiveUsers(data)
+				})
+				
 				alert('Zalogowano')
 			})
-			.catch((error) => { console.log(error); alert('Podano błędne dane') })
+			.catch((error) => { if (error.message === "Network Error") {alert('Coś poszło nie tak')} else { alert('Podano błędne dane')}  })
 	}
 
 	async function createUser(values) {

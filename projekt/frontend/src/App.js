@@ -16,36 +16,34 @@ import './App.scss'
 
 
 function App() {
+	const [socket, setSocket]= useState(null)
 	const [user, setUser] = useState(Cookies.get('user'));
 	const [token, setToken] = useState(Cookies.get('token'));
+	const [activeUsers, setActiveUsers] = useState([]);
 	const ENDPOINT = "http://127.0.0.1:4001";
-
-	const [response, setResponse] = useState("");
-	const socket = socketIOClient(ENDPOINT);
-
+	
 	useEffect(() => {
-	  socket.on("FromAPI", data => {
-		setResponse(data);
-		console.log(response)
-	  });
-	}, []);
-
+		setSocket(socketIOClient(ENDPOINT))
+	
+	}, []
+	);
 
 	if (!token && !user) {
-		return <Login setToken={setToken} setUser={setUser} />
+		return <Login setToken={setToken} setUser={setUser} activeUsers={activeUsers} setActiveUsers={setActiveUsers} socket={socket} />
 	}
+
 
 	return (
 		<BrowserRouter>
 			<div>
-				<Navbar user={user}/>
+				<Navbar user={user} socket={socket}/>
 				<div className='container'>
 					<Routes>
 						<Route exact path='/users/:id' element={<Profile userSession={user}/>}/>
-						<Route exact path='/users/:id/posts/:postId' element={<Post/>}></Route>
-						<Route exact path='/' element={<Main user={user}/>}></Route>
+						<Route exact path='/users/:id/posts/:postId' element={<Post socket={socket}/>}></Route>
+						<Route exact path='/' element={<Main user={user} socket={socket && socket} activeUsers={activeUsers}/>}></Route>
 						<Route exact path='/chatrooms' element={<Chatrooms  user={user} socket={socket}/>}></Route>
-						<Route exact path='/posts/:id' element={<Post user={user}/>}></Route>
+						<Route exact path='/posts/:id' element={<Post user={user} socket={socket}/>}></Route>
 						<Route exact path='/settings' element={<Settings user={user}/>}></Route>
 						<Route path='*' element={<PageNotFound />} />
 					</Routes>

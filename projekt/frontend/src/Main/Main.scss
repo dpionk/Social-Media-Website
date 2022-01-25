@@ -6,13 +6,13 @@
   gap: 50px;
 
   .list-group-item {
-	border-radius: 20px;
+    border-radius: 20px;
     .form {
-		form {
-			display:flex;
-			flex-direction: column;
-			gap:20px;
-		}
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
     }
   }
   .active-feed {
@@ -21,6 +21,23 @@
     .activeUsers {
       border-radius: 20px;
       flex: 1;
+
+      .users-list {
+        display: flex;
+        flex-direction: column;
+        .active-user {
+			display:flex;
+			flex-direction: row;
+			align-items: center;
+			gap:5px;
+          .active {
+            height: 20px;
+            width: 20px;
+            background-color: rgb(113, 196, 113);
+            border-radius: 50%;
+          }
+        }
+      }
     }
 
     .feed {

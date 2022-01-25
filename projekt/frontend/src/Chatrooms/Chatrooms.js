@@ -26,7 +26,7 @@ function Chatrooms({ socket, user }) {
 		socket.on('message', data => {
 			setMessages([...messages, data])
 		});
-	}, [messages, socket]);
+	}, [messages]);
 
 
 

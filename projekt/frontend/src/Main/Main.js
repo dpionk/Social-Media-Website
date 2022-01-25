@@ -1,8 +1,22 @@
 import { Formik, Field } from 'formik';
 import './Main.scss'
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
-function Main({ user }) {
+function Main({ user, activeUsers, socket }) {
+
+
+	const [newestPosts, setNewestPosts] = useState([]);
+
+	useEffect(() => {
+		
+		socket && socket.on('post', data => {
+			setNewestPosts([...newestPosts, data])
+		});
+	}, [newestPosts]);
+
+
 
 	const handleValidate = (values) => {
 		const errors = {}
@@ -18,7 +32,7 @@ function Main({ user }) {
 
 	const createPost = async (values) => {
 		axios.post('http://localhost:5000/posts', values).then((data) => {
-			console.log(data);
+			socket.emit('post', values)
 			alert('Dodano')
 		}).catch((error) => {
 			console.log(error)
@@ -75,14 +89,28 @@ function Main({ user }) {
 			<div className='active-feed'>
 				<div className='activeUsers list-group-item'>
 						<h4>Aktywni użytkownicy</h4>
-					<div>
-						fgfdg
+					<div className='users-list'>
+						{activeUsers && activeUsers.map((user) => {
+							return (
+							<div className='active-user' key={user.user_id}>
+								<div className='active'/>
+								<div className='user'><Link to={`/users/${user.user_id}`}>{user.username}</Link></div>
+							</div>
+							)
+						})}
 					</div>
 				</div>
 				<div className='feed list-group-item'>
-						<h4>Najnowsze posty</h4>
-					<div>
-						fgfdg
+				<h4>Najnowsze posty</h4>
+					<div className='users-list'>
+						{newestPosts.length !== 0 && newestPosts.map((post) => {
+							return (
+							<div className='active-user' key={Math.random()}>
+								<div className='active'/>
+								<div className='user'><Link to={`/users/${post.creator}`}>{post.title}</Link></div>
+							</div>
+							)
+						})}
 					</div>
 				</div>
 			</div>
