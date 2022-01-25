@@ -1,12 +1,35 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import './Navbar.scss'
 
 
-function Navbar({ user, mqtt }) {
+function Navbar({ user, mqtt , setActiveUsers}) {
 
 	const [clicked, setClicked] = useState(false);
+
+	
+	useEffect(() => {
+		
+		mqtt.subscribe("logout");
+
+		const handleMessage = (topic, user) => {
+			
+			if (topic !== "logout") return;
+			setActiveUsers((activeUsers) => activeUsers.filter((users) => {
+				return users.user_id !== parseInt(user)
+			}));
+		};
+
+		mqtt.addMessageHandler(handleMessage);
+
+		//return () => {
+		//	mqtt.unsubscribe("logout");
+		//	mqtt.removeMessageHandler(handleMessage);
+		//}
+
+	}, [mqtt, setActiveUsers]);
+
 
 	const handleClick = () => {
 		setClicked(
@@ -15,10 +38,11 @@ function Navbar({ user, mqtt }) {
 	}
 
 	const logout = () => {
-		//socket.emit('logout', user)
+		mqtt.publish("logout", JSON.stringify(user));
 		localStorage.clear();
 		Cookies.remove('token')
 		Cookies.remove('user')
+		Cookies.remove('admin')
 		window.location.href = "/";
 	}
 	return (

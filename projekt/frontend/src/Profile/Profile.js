@@ -9,7 +9,7 @@ import axios from 'axios';
 import './Profile.scss'
 
 
-function Profile({ userSession }) {
+function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 	const { id } = useParams();
 	const history = useNavigate();
 
@@ -19,13 +19,34 @@ function Profile({ userSession }) {
 	const [showAddPicture, setShowAddPicture] = useState(false);
 
 
-	const logout = () => {
-		localStorage.clear();
-		Cookies.remove('token')
-		Cookies.remove('user')
-		window.location.href = "/";
-	}
+	useEffect(() => {
+		
+		mqtt.subscribe("logout");
 
+		const handleMessage = (topic, user) => {
+			
+			if (topic !== "logout") return;
+			setActiveUsers((activeUsers) => activeUsers.filter((users) => {
+				return users.user_id !== parseInt(user)
+			}));
+			localStorage.clear();
+			Cookies.remove('token')
+			Cookies.remove('user')
+			window.location.href = "/";
+		};
+
+		mqtt.addMessageHandler(handleMessage);
+
+		//return () => {
+		//	mqtt.unsubscribe("logout");
+		//	mqtt.removeMessageHandler(handleMessage);
+		//}
+
+	}, [mqtt, setActiveUsers]);
+
+	const logout = (user) => {
+		mqtt.publish("logout", user);
+	}
 
 	const downloadUser = () => {
 		axios.get(`http://localhost:5000/users/${id}`).then((response) => {
@@ -47,10 +68,14 @@ function Profile({ userSession }) {
 		})
 	}
 
-	const deleteUser = () => {
-		axios.delete(`http://localhost:5000/users/${userSession}`).then(() => {
+
+	const deleteUser =  () => {
+		axios.delete(`http://localhost:5000/users/${id}`).then(async () => {
+			await logout(id);
 			alert('Usunięto profil :(')
-			logout();
+			history('/')
+			
+			
 		}).catch(error => {
 			console.log(error)
 		}).finally(() => {
@@ -87,7 +112,7 @@ function Profile({ userSession }) {
 					<div className="list-group-item">
 						<div className="img">
 							<img src={user.picture ? user.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt="" />
-							{parseInt(userSession) === user.user_id ? <button className="btn" type="button" onClick={() => setShowAddPicture(!showAddPicture)}><AiFillEdit /></button> : null}
+							{parseInt(userSession) === user.user_id? <button className="btn" type="button" onClick={() => setShowAddPicture(!showAddPicture)}><AiFillEdit /></button> : null}
 							{showAddPicture ? <div className='form'>
 								<Formik
 									enableReinitialize
@@ -122,7 +147,7 @@ function Profile({ userSession }) {
 										{user.username} {user.role === 'admin' ? <GrUserAdmin /> : null}
 									</div>
 									<div className="button-back">
-									{parseInt(userSession) === user.user_id ? <button className="btn" type="button" onClick={deleteUser}><AiFillDelete /></button> : null}
+									{parseInt(userSession) === user.user_id || isAdmin === true ?  <button className="btn" type="button" onClick={deleteUser}><AiFillDelete /></button> : null}
 										<button className="btn" type="button" onClick={() => { history(-1); }}><RiArrowGoBackLine /></button>
 									</div>
 								</div>

@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 function Main({ user, activeUsers, mqtt }) {
-
 	const [newestPosts, setNewestPosts] = useState([]);
+
 
 	useEffect(() => {
 		

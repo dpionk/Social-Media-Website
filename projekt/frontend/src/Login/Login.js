@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Formik, Field } from "formik";
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -7,10 +7,29 @@ import './Login.scss'
 
 
 
-function Login({ setToken, setUser, activeUsers, setActiveUsers, mqtt }) {
+function Login({ setToken, setUser, setIsAdmin, active, setActiveUsers, mqtt }) {
 
 	const [username, setUserName] = useState();
 	const [password, setPassword] = useState();
+
+	console.log(active)
+	useEffect(() => {
+		
+		mqtt.subscribe("active");
+
+		const handleMessage = (topic, user) => {
+			if (topic !== "active") return;
+			setActiveUsers((activeUsers) => [...activeUsers, JSON.parse(user)]);
+		};
+
+		mqtt.addMessageHandler(handleMessage);
+
+		//return () => {
+		//	mqtt.unsubscribe("active");
+		//	mqtt.removeMessageHandler(handleMessage);
+		//}
+
+	}, [mqtt, setActiveUsers]);
 
 	const handleValidateRegister = (values) => {
 		const errors = {};
@@ -54,12 +73,10 @@ function Login({ setToken, setUser, activeUsers, setActiveUsers, mqtt }) {
 				setToken(data.data.token ? data.data.token : undefined);
 				Cookies.set('token', data.data.token, { expires: now });
 				Cookies.set('user', data.data.user.user_id, { expires: now });
+				{ data.data.user.role === 'default' ? setIsAdmin(false) : setIsAdmin(true)}
 				setUser(data.data.user.user_id);
+
 				mqtt.publish("active", JSON.stringify(data.data.user));
-				// socket.emit('active', data.data.user)
-				// socket.on('active', data => {
-				// 	setActiveUsers(data)
-				// })
 				
 				alert('Zalogowano')
 			})

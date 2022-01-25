@@ -5,7 +5,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
 import './Post.scss'
 
-function Post({ user, socket }) {
+function Post({ user, mqtt, isAdmin }) {
 
 	const history = useNavigate();
 	const [comments, setComments] = useState();
@@ -59,11 +59,7 @@ function Post({ user, socket }) {
 
 	const handleSubmit = (values) => {
 		axios.post(`http://localhost:5000/comments/${id}`, values).then(() => {
-			socket.emit('comment', values)
-
-			socket.on('comment', () => {
-				downloadComments();
-			})
+			mqtt.publish(`comment/${id}`, JSON.stringify(values));
 		}).catch(error => {
 			console.log(error)
 			alert('Coś poszło nie tak')
@@ -117,7 +113,28 @@ function Post({ user, socket }) {
 		downloadComments();
 
 	}, [id]
+
+	
 	);
+
+	useEffect(() => {
+		
+		mqtt.subscribe(`comment/${id}`);
+		const handleMessage = (topic, comment) => {
+			if (topic !== `comment/${id}`) return;
+			//setComments((comments) => [...comments, JSON.parse(comment)]);
+			downloadComments();
+		};
+
+		mqtt.addMessageHandler(handleMessage);
+
+		return () => {
+			mqtt.unsubscribe(`comment/${id}`);
+			mqtt.removeMessageHandler(handleMessage);
+		}
+
+	}, [mqtt, id]);
+
 
 	return (
 		<div className='post-container'>
@@ -127,7 +144,7 @@ function Post({ user, socket }) {
 						<div className='edit-post'>
 							<div className='title'>{!editingPost ? post.title : null}
 								{parseInt(user) === post.creator ? <button className="btn" type="button" onClick={() => { setEditingPost(!editingPost) }}><AiFillEdit /></button> : null}
-								{parseInt(user) === post.creator ? <button className="btn" type="button" onClick={() => { deletePost(post.post_id) }}><AiFillDelete /></button> : null}
+								{parseInt(user) === post.creator || isAdmin === true ? <button className="btn" type="button" onClick={() => { deletePost(post.post_id) }}><AiFillDelete /></button> : null}
 							</div>
 							<div>
 							</div>
@@ -178,7 +195,7 @@ function Post({ user, socket }) {
 									<div>
 										<img src={comment.picture ? comment.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
 										<Link to={`/users/${comment.user_id}`}>{comment.username} </Link>
-									</div> {parseInt(user) === comment.person_id ? <div><button className="btn" type="button" onClick={() => { deleteComment(comment.comment_id) }}><AiFillDelete /></button><button className="btn" type="button" onClick={() => { ; if (!editingComment[0]) { setEditingComment([true, comment.comment_id]) } else { setEditingComment([false, null]); } }}><AiFillEdit /></button></div> : null}
+									</div> {parseInt(user) === comment.person_id || isAdmin === true ? <div><button className="btn" type="button" onClick={() => { deleteComment(comment.comment_id) }}><AiFillDelete /></button><button className="btn" type="button" onClick={() => { ; if (!editingComment[0]) { setEditingComment([true, comment.comment_id]) } else { setEditingComment([false, null]); } }}><AiFillEdit /></button></div> : null}
 								</div>
 								<div> {editingComment[0] && editingComment[1] === comment.comment_id ?
 

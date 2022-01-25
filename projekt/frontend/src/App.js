@@ -16,11 +16,14 @@ import './App.scss'
 
 
 function App() {
+	const [activeUsers, setActiveUsers] = useState([]);
 	const [mqtt, setMqtt]= useState(null)
 	const [user, setUser] = useState(Cookies.get('user'));
 	const [token, setToken] = useState(Cookies.get('token'));
-	const [activeUsers, setActiveUsers] = useState([]);
+	const [isAdmin, setIsAdmin]= useState(false);
+	
 	const ENDPOINT = "http://127.0.0.1:4001";
+
 
 	useEffect(() => {
 		const socket = socketIOClient(ENDPOINT);
@@ -52,19 +55,19 @@ function App() {
 
 	if (!mqtt) return <div>Loading MQTT...</div>;
 	if (!token && !user) {
-		return <Login setToken={setToken} setUser={setUser} activeUsers={activeUsers} setActiveUsers={setActiveUsers} mqtt={mqtt} />
+		return <Login setToken={setToken} setUser={setUser} mqtt={mqtt} setActiveUsers={setActiveUsers} active={activeUsers} setIsAdmin={setIsAdmin} />
 	}
+
 	return (
 		<BrowserRouter>
 			<div>
-				<Navbar user={user} mqtt={mqtt}/>
+				<Navbar user={user} mqtt={mqtt} setActiveUsers={setActiveUsers}/>
 				<div className='container'>
 					<Routes>
-						<Route exact path='/users/:id' element={<Profile userSession={user}/>}/>
-						<Route exact path='/users/:id/posts/:postId' element={<Post mqtt={mqtt}/>}></Route>
-						<Route exact path='/' element={<Main user={user} activeUsers={activeUsers} mqtt={mqtt}/>}></Route>
+						<Route exact path='/users/:id' element={<Profile userSession={user} isAdmin={isAdmin} activeUsers={activeUsers} mqtt={mqtt}/>}/>
+						<Route exact path='/' element={<Main user={user} mqtt={mqtt} activeUsers={activeUsers}/>}></Route>
 						<Route exact path='/chatrooms' element={<Chatrooms  user={user} mqtt={mqtt}/>}></Route>
-						<Route exact path='/posts/:id' element={<Post user={user} mqtt={mqtt}/>}></Route>
+						<Route exact path='/posts/:id' element={<Post user={user} mqtt={mqtt} isAdmin={isAdmin}/>}></Route>
 						<Route exact path='/settings' element={<Settings user={user}/>}></Route>
 						<Route path='*' element={<PageNotFound />} />
 					</Routes>
