@@ -20,6 +20,7 @@ const comments = require('./routes/comments');
 
 
 
+
 app.use(express.json());
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
@@ -34,6 +35,8 @@ app.use(function (req, res, next) {
 app.use('/users', users);
 app.use('/posts', posts);
 app.use('/comments', comments);
+
+let activeUsers = []
 
 
 client
@@ -83,14 +86,12 @@ client
 
 
 
-let activeUsers = []
+
 
 io.on('connection', async (socket) => {
 	console.log('New client connected');
 	
 	
-	const sockets = await io.fetchSockets();
-	console.log(sockets.length)
 	socket.on('disconnect', () => {
 
 		console.log('Client disconnected');
@@ -107,7 +108,7 @@ io.on('connection', async (socket) => {
 			if (t === 'active') {
 				
 				socket.emit('active', activeUsers)
-				MQTTclient.end()
+				//MQTTclient.end()
 			}
 		})
 	})
@@ -137,7 +138,7 @@ io.on('connection', async (socket) => {
 		MQTTclient.on('message', (t, m) => {
 			if (t === 'chat') {
 				socket.emit('message', data)
-				MQTTclient.end()
+				//MQTTclient.end()
 			}
 		})
 	})
