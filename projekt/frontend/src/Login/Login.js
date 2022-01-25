@@ -7,7 +7,7 @@ import './Login.scss'
 
 
 
-function Login({ setToken, setUser, activeUsers, setActiveUsers, socket }) {
+function Login({ setToken, setUser, activeUsers, setActiveUsers, mqtt }) {
 
 	const [username, setUserName] = useState();
 	const [password, setPassword] = useState();
@@ -55,10 +55,11 @@ function Login({ setToken, setUser, activeUsers, setActiveUsers, socket }) {
 				Cookies.set('token', data.data.token, { expires: now });
 				Cookies.set('user', data.data.user.user_id, { expires: now });
 				setUser(data.data.user.user_id);
-				socket.emit('active', data.data.user)
-				socket.on('active', data => {
-					setActiveUsers(data)
-				})
+				mqtt.publish("active", JSON.stringify(data.data.user));
+				// socket.emit('active', data.data.user)
+				// socket.on('active', data => {
+				// 	setActiveUsers(data)
+				// })
 				
 				alert('Zalogowano')
 			})

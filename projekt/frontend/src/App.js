@@ -16,34 +16,55 @@ import './App.scss'
 
 
 function App() {
-	const [socket, setSocket]= useState(null)
+	const [mqtt, setMqtt]= useState(null)
 	const [user, setUser] = useState(Cookies.get('user'));
 	const [token, setToken] = useState(Cookies.get('token'));
 	const [activeUsers, setActiveUsers] = useState([]);
 	const ENDPOINT = "http://127.0.0.1:4001";
-	
+
 	useEffect(() => {
-		setSocket(socketIOClient(ENDPOINT))
-	
-	}, []
-	);
+		const socket = socketIOClient(ENDPOINT);
+		const mqtt = {
+			publish: function(topic, message) {
+				socket.emit('publish', {topic, message})
+			},
+			subscribe: function(topic) {
+				socket.emit('subscribe', topic)
+			},
+			unsubscribe: function(topic) {
+				socket.emit('unsubscribe', topic)
+			},
+			messageHandlers: new Set(),
+			addMessageHandler: function(messageHandler) {
+				this.messageHandlers.add(messageHandler);
+			},
+			removeMessageHandler: function(messageHandler) {
+				this.messageHandlers.delete(messageHandler);
+			},
+		};
+		setMqtt(mqtt);
+		socket.on("message", ({topic, message}) => {
+			for (const messageHandler of mqtt.messageHandlers) {
+				messageHandler(topic, message.toString());
+			}
+		});
+	}, []);
 
+	if (!mqtt) return <div>Loading MQTT...</div>;
 	if (!token && !user) {
-		return <Login setToken={setToken} setUser={setUser} activeUsers={activeUsers} setActiveUsers={setActiveUsers} socket={socket} />
+		return <Login setToken={setToken} setUser={setUser} activeUsers={activeUsers} setActiveUsers={setActiveUsers} mqtt={mqtt} />
 	}
-
-
 	return (
 		<BrowserRouter>
 			<div>
-				<Navbar user={user} socket={socket}/>
+				<Navbar user={user} mqtt={mqtt}/>
 				<div className='container'>
 					<Routes>
 						<Route exact path='/users/:id' element={<Profile userSession={user}/>}/>
-						<Route exact path='/users/:id/posts/:postId' element={<Post socket={socket}/>}></Route>
-						<Route exact path='/' element={<Main user={user} socket={socket && socket} activeUsers={activeUsers}/>}></Route>
-						<Route exact path='/chatrooms' element={<Chatrooms  user={user} socket={socket}/>}></Route>
-						<Route exact path='/posts/:id' element={<Post user={user} socket={socket}/>}></Route>
+						<Route exact path='/users/:id/posts/:postId' element={<Post mqtt={mqtt}/>}></Route>
+						<Route exact path='/' element={<Main user={user} activeUsers={activeUsers} mqtt={mqtt}/>}></Route>
+						<Route exact path='/chatrooms' element={<Chatrooms  user={user} mqtt={mqtt}/>}></Route>
+						<Route exact path='/posts/:id' element={<Post user={user} mqtt={mqtt}/>}></Route>
 						<Route exact path='/settings' element={<Settings user={user}/>}></Route>
 						<Route path='*' element={<PageNotFound />} />
 					</Routes>

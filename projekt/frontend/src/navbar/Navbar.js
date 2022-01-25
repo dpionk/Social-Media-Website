@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import './Navbar.scss'
 
 
-function Navbar({ user, socket }) {
+function Navbar({ user, mqtt }) {
 
 	const [clicked, setClicked] = useState(false);
 
@@ -15,7 +15,7 @@ function Navbar({ user, socket }) {
 	}
 
 	const logout = () => {
-		socket.emit('logout', user)
+		//socket.emit('logout', user)
 		localStorage.clear();
 		Cookies.remove('token')
 		Cookies.remove('user')

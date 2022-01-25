@@ -4,11 +4,10 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './Chatrooms.scss'
 
-function Chatrooms({ socket, user }) {
+function Chatrooms({ mqtt, user }) {
 
 	const [messages, setMessages] = useState([{ 'id' : 'bot', 'author': 'Chat bot', 'message': 'Witaj na chacie ogólnym :)' }]);
 	const [userInfo,setUserInfo] = useState(null);
-
 
 	const downloadUser = () => {
 		axios.get(`http://localhost:5000/users/${user}`).then((response) => {
@@ -20,18 +19,42 @@ function Chatrooms({ socket, user }) {
 		})
 	}
 
-
 	useEffect(() => {
 		downloadUser();
-		socket.on('message', data => {
-			setMessages([...messages, data])
-		});
-	}, [messages]);
+	}, []);
+
+
+	useEffect(() => {
+		
+		mqtt.subscribe("chat");
+		const handleMessage = (topic, message) => {
+			if (topic !== "chat") return;
+			setMessages((messages) => [...messages, JSON.parse(message)]);
+		};
+
+		mqtt.addMessageHandler(handleMessage);
+
+		return () => {
+			mqtt.unsubscribe("chat");
+			mqtt.removeMessageHandler(handleMessage);
+		}
+
+	}, [mqtt]);
+
+
+
+	//useEffect(() => {
+	//	downloadUser();
+	//	socket.on('message', data => {
+	//		setMessages([...messages, data])
+	//	});
+	//}, [messages]);
 
 
 
 	const handleSubmit = values => {
-		socket.emit('message', values);
+		// socket.emit('message', values);
+		mqtt.publish("chat", JSON.stringify(values));
 	}
 
 	return (
@@ -40,7 +63,7 @@ function Chatrooms({ socket, user }) {
 			<div className='container'>
 			<h4>Chat ogólny</h4>
 			<div className='messages'>
-			{messages.reverse().map(message => {
+			{messages.map(message => {
 				return (
 					<div className='message list-group-item' key={Math.random()}>
 							<p>{ message.id !== 'bot' ? <Link to={`/users/${message.id}`}>{message.author}</Link> : message.author }</p>

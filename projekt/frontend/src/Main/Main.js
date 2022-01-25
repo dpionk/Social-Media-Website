@@ -4,17 +4,27 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-function Main({ user, activeUsers, socket }) {
-
+function Main({ user, activeUsers, mqtt }) {
 
 	const [newestPosts, setNewestPosts] = useState([]);
 
 	useEffect(() => {
 		
-		socket && socket.on('post', data => {
-			setNewestPosts([...newestPosts, data])
-		});
-	}, [newestPosts]);
+		mqtt.subscribe("post");
+		const handlePost = (topic, post) => {
+			if (topic !== "post") return;
+			setNewestPosts((newestPosts) => [...newestPosts, JSON.parse(post)]);
+		};
+
+		mqtt.addMessageHandler(handlePost);
+
+		return () => {
+			mqtt.unsubscribe("post");
+			mqtt.removeMessageHandler(handlePost);
+		}
+
+	}, [mqtt]);
+
 
 
 
@@ -32,7 +42,7 @@ function Main({ user, activeUsers, socket }) {
 
 	const createPost = async (values) => {
 		axios.post('http://localhost:5000/posts', values).then((data) => {
-			socket.emit('post', values)
+			mqtt.publish("post", JSON.stringify(values));
 			alert('Dodano')
 		}).catch((error) => {
 			console.log(error)

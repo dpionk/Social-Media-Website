@@ -85,91 +85,132 @@ client
 
 
 
+const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
+
+const subscriptions = new Map();
+
+// {
+// 	"chat-room-1": [socket1, socket2]
+// }
+
+MQTTclient.on("message", (topic, message) => {
+	if (!subscriptions.has(topic)) return;
+	const subscribedSockets = subscriptions.get(topic);
+	for (const socket of subscribedSockets) {
+		socket.emit('message', {topic, message: message.toString()});
+	}
+});
 
 
 
 io.on('connection', async (socket) => {
-	console.log('New client connected');
-	
-	
+	socket.on("connect", async () => {
+		console.log('New client connected');
+	});
 	socket.on('disconnect', () => {
 
 		console.log('Client disconnected');
+		for (const [topic, subscribedSockets] of subscriptions.entries()) {
+			subscribedSockets.delete(socket);
+			if (subscribedSockets.size === 0) {
+				subscriptions.delete(topic);
+				MQTTclient.unsubscribe(topic);
+			}
+		}
 	});
 
-	socket.on('active', (data) => {
-		activeUsers.push(data)
-		const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
+	socket.on("publish", ({topic, message}) => {
+		console.log(`Publishing to ${topic}:`, message);
+		MQTTclient.publish(topic, message);
+	});
 
-		MQTTclient.subscribe('active');
-		MQTTclient.publish('active', JSON.stringify(data));
+	socket.on("subscribe", (topic) => {
+		if (!subscriptions.has(topic)) {
+			subscriptions.set(topic, new Set());
+			MQTTclient.subscribe(topic);
+		}
+		subscriptions.get(topic).add(socket);
+	});
+	socket.on("unsubscribe", (topic) => {
+		if (!subscriptions.has(topic)) return
+		subscriptions.get(topic).delete(socket);
+		if (subscriptions.get(topic).size !== 0) return;
+		MQTTclient.unsubscribe(topic);
+		subscriptions.delete(topic);
+	});
 
-		MQTTclient.on('message', (t, m) => {
-			if (t === 'active') {
+
+	// socket.on('active', (data) => {
+	// 	activeUsers.push(data)
+		
+	// 	// MQTTclient.publish('active', JSON.stringify(data));
+
+	// 	// MQTTclient.on('message', (t, m) => {
+	// 	// 	if (t === 'active') {
 				
-				socket.emit('active', activeUsers)
-				//MQTTclient.end()
-			}
-		})
-	})
+	// 	// 		socket.emit('active', activeUsers)
+	// 	// 		//MQTTclient.end()
+	// 	// 	}
+	// 	// })
+	// })
 
-	socket.on('logout', (data) => {
-		const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
-		MQTTclient.subscribe('logout');
-		MQTTclient.publish('logout', JSON.stringify(data));
+	// socket.on('logout', (data) => {
+	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
+	// 	MQTTclient.subscribe('logout');
+	// 	MQTTclient.publish('logout', JSON.stringify(data));
 
-		MQTTclient.on('message', (t, m) => {
-			if (t === 'logout') {
-				activeUsers = activeUsers.filter((user) => {
-					return user.user_id !== data
-				})
-				socket.emit('active', activeUsers)
-				MQTTclient.end()
-			}
-		})
-	})
+	// 	MQTTclient.on('message', (t, m) => {
+	// 		if (t === 'logout') {
+	// 			activeUsers = activeUsers.filter((user) => {
+	// 				return user.user_id !== data
+	// 			})
+	// 			socket.emit('active', activeUsers)
+	// 			MQTTclient.end()
+	// 		}
+	// 	})
+	// })
 
-	socket.on('message', (data) => {
-		const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
+	// socket.on('message', (data) => {
+	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
 
-		MQTTclient.subscribe('chat');
-		MQTTclient.publish('chat', JSON.stringify(data));
+	// 	MQTTclient.subscribe('chat');
+	// 	MQTTclient.publish('chat', JSON.stringify(data));
 
-		MQTTclient.on('message', (t, m) => {
-			if (t === 'chat') {
-				socket.emit('message', data)
-				//MQTTclient.end()
-			}
-		})
-	})
+	// 	MQTTclient.on('message', (t, m) => {
+	// 		if (t === 'chat') {
+	// 			socket.emit('message', data)
+	// 			//MQTTclient.end()
+	// 		}
+	// 	})
+	// })
 
-	socket.on('post', (data) => {
-		const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
+	// socket.on('post', (data) => {
+	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
 
-		MQTTclient.subscribe('post');
-		MQTTclient.publish('post', JSON.stringify(data));
+	// 	MQTTclient.subscribe('post');
+	// 	MQTTclient.publish('post', JSON.stringify(data));
 
-		MQTTclient.on('message', (t, m) => {
-			if (t === 'post') {
-				socket.emit('post', data)
-				MQTTclient.end()
-			}
-		})
-	})
+	// 	MQTTclient.on('message', (t, m) => {
+	// 		if (t === 'post') {
+	// 			socket.emit('post', data)
+	// 			MQTTclient.end()
+	// 		}
+	// 	})
+	// })
 
-	socket.on('comment', (data) => {
-		const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
+	// socket.on('comment', (data) => {
+	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
 
-		MQTTclient.subscribe('comment');
-		MQTTclient.publish('comment', JSON.stringify(data));
+	// 	MQTTclient.subscribe('comment');
+	// 	MQTTclient.publish('comment', JSON.stringify(data));
 
-		MQTTclient.on('message', (t, m) => {
-			if (t === 'comment') {
-				socket.emit('comment', data)
-				MQTTclient.end()
-			}
-		})
-	})
+	// 	MQTTclient.on('message', (t, m) => {
+	// 		if (t === 'comment') {
+	// 			socket.emit('comment', data)
+	// 			MQTTclient.end()
+	// 		}
+	// 	})
+	// })
 });
 
 server.listen(4001, () => console.log(`Socket listening on port 4001`));
