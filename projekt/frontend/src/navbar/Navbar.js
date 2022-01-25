@@ -45,7 +45,7 @@ function Navbar({ user }) {
 							</li>
 							<li className='nav-item'>
 								<Link to="/chatrooms" style={{ textDecoration: 'none' }}>
-									<div className="nav-link">Chaty</div>
+									<div className="nav-link">Chat</div>
 								</Link>
 							</li>
 

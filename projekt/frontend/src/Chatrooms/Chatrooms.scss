@@ -1,0 +1,33 @@
+@import "~bootstrap/scss/bootstrap";
+
+.chatroom {
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .message {
+        border-radius: 20px;
+
+        p {
+          &:first-of-type {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+
+    .form {
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  }
+}

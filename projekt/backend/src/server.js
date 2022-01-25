@@ -1,18 +1,26 @@
 const express = require('express');
 const app = express();
+const http = require('http');
+
+const mqtt = require('mqtt');
+
+const socketIo = require('socket.io');
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+	cors: {
+		origin: 'http://localhost:3000',
+	}
+});
+
 const client = require('./config/psqlClient');
 const users = require('./routes/users');
 const posts = require('./routes/posts');
 const comments = require('./routes/comments');
-//const cors = require('cors');
-
-//const path = require('path')
 
 
 
 app.use(express.json());
-//app.use(cors());
-
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
@@ -22,14 +30,11 @@ app.use(function (req, res, next) {
 	);
 	next();
   });
-//app.use(express.static(path.join(__dirname,'build')));
+
 app.use('/users', users);
 app.use('/posts', posts);
 app.use('/comments', comments);
 
-//app.get('/', (req, res) => {
-//	res.sendFile(path.join(__dirname, 'build', 'index.html'));
-//})
 
 client
 .connect()
@@ -74,3 +79,34 @@ client
   });
 })
 .catch(err => console.error('Connection error', err.stack));
+
+
+
+    
+
+
+io.on('connection', (socket) => {
+	console.log('New client connected');
+	
+
+	socket.on('disconnect', () => {
+	  console.log('Client disconnected');
+	});
+
+	socket.on('message', (data) => {
+		const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
+
+		
+		MQTTclient.subscribe('chat');
+		MQTTclient.publish('chat', JSON.stringify(data));
+
+		MQTTclient.on('message', (t, m) => {
+			if (t === 'chat') {
+			socket.emit('message', data)
+			MQTTclient.end()
+			}
+		})
+	})
+  });
+
+  server.listen(4001, () => console.log(`Socket listening on port 4001`));

@@ -1,35 +1,54 @@
 import { useState, useEffect } from 'react';
 import { Field, Formik } from 'formik';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import './Chatrooms.scss'
+
+function Chatrooms({ socket, user }) {
+
+	const [messages, setMessages] = useState([{ 'id' : 'bot', 'author': 'Chat bot', 'message': 'Witaj na chacie ogólnym :)' }]);
+	const [userInfo,setUserInfo] = useState(null);
 
 
-function Chatrooms({ client, user }) {
+	const downloadUser = () => {
+		axios.get(`http://localhost:5000/users/${user}`).then((response) => {
+			setUserInfo(response.data)
+		}).catch(error => {
+			console.log(error)
+		}).finally(() => {
+			//setLoading(false);
+		})
+	}
 
 
-	client.subscribe('chat');
+	useEffect(() => {
+		downloadUser();
+		socket.on('message', data => {
+			setMessages([...messages, data])
+		});
+	}, [messages, socket]);
 
 
-	const [messages, setMessages] = useState([{'author': 'Chat bot', 'message': 'Witaj na chacie ogólnym :)'}]);
-	client.on('message', (t, m) => {
-		if (t === 'chat') {
-			const [author, message] = m.toString().split(':')
-			setMessages([...messages, { author: author, message: message }])
-		}
-	})
 
 	const handleSubmit = values => {
-		client.publish('chat', `${values.username}:${values.message}`)
+		socket.emit('message', values);
 	}
 
 	return (
-		<div>
-			{messages.map(message => {
+		<div className='chatroom'>
+			{ userInfo && 
+			<div className='container'>
+			<h4>Chat ogólny</h4>
+			<div className='messages'>
+			{messages.reverse().map(message => {
 				return (
-					<div>
-					<p>{message.author}</p>
-					<p>{message.message}</p>
+					<div className='message list-group-item' key={Math.random()}>
+							<p>{ message.id !== 'bot' ? <Link to={`/users/${message.id}`}>{message.author}</Link> : message.author }</p>
+							<p>{message.message}</p>
 					</div>
 				)
 			})}
+			</div>
 			<div className='form'>
 				<Formik
 					enableReinitialize
@@ -37,7 +56,8 @@ function Chatrooms({ client, user }) {
 					onSubmit={handleSubmit}
 					initialValues={
 						{
-							username: user,
+							id: user,
+							author: userInfo.username,
 							message: ''
 						}
 					}
@@ -45,7 +65,7 @@ function Chatrooms({ client, user }) {
 					{
 						(formProps) => (
 							<form>
-								<h4>Chat ogólny</h4>
+								
 								<div className='form-group'>
 									<Field type='text' as='textarea' className='form-control' name='message' placeholder='wpisz wiadomość...' >
 									</Field>
@@ -57,6 +77,7 @@ function Chatrooms({ client, user }) {
 					}
 				</Formik>
 			</div>
+			</div>}
 		</div>
 	);
 }
