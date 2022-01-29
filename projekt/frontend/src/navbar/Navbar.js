@@ -1,20 +1,21 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 import './Navbar.scss'
 
 
-function Navbar({ user, mqtt , setActiveUsers}) {
+function Navbar({ user, mqtt, setActiveUsers }) {
 
 	const [clicked, setClicked] = useState(false);
 
-	
+
 	useEffect(() => {
-		
+
 		mqtt.subscribe("logout");
 
 		const handleMessage = (topic, user) => {
-			
+
 			if (topic !== "logout") return;
 			setActiveUsers((activeUsers) => activeUsers.filter((users) => {
 				return users.user_id !== parseInt(user)
@@ -38,12 +39,18 @@ function Navbar({ user, mqtt , setActiveUsers}) {
 	}
 
 	const logout = () => {
-		mqtt.publish("logout", JSON.stringify(user));
-		localStorage.clear();
-		Cookies.remove('token')
-		Cookies.remove('user')
-		Cookies.remove('admin')
-		window.location.href = "/";
+		axios.delete(`http://localhost:5000/users/active/${user}`).then(() => {
+			mqtt.publish("logout", JSON.stringify(user));
+			localStorage.clear();
+			Cookies.remove('token')
+			Cookies.remove('user')
+			Cookies.remove('admin')
+			window.location.href = "/";
+		}).catch((error) => {
+			console.log(error)
+			alert('Coś poszło nie tak')
+		})
+
 	}
 	return (
 		<div>

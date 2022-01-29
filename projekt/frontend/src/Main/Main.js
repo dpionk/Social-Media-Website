@@ -100,7 +100,7 @@ function Main({ user, activeUsers, mqtt }) {
 				<div className='activeUsers list-group-item'>
 						<h4>Aktywni użytkownicy</h4>
 					<div className='users-list'>
-						{activeUsers && activeUsers.map((user) => {
+						{activeUsers.length !== 0  && activeUsers.map((user) => {
 							return (
 							<div className='active-user' key={user.user_id}>
 								<div className='active'/>

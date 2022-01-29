@@ -12,13 +12,28 @@ const messages = {
     WRONG_LOGIN_CREDENTIALS: 'WRONG_LOGIN_CREDENTIALS'
 };
 
-//const users = [{ 'id' : '1', 'username': 'username', 'password': 'password', 'first_name': 'Daria', 'last_name': 'Pionk' }, {'id': '2', 'username': '1', 'password': '1', 'first_name': 'Mikołaj', 'last_name': 'Kubiak'}]
 const jwtSecret = 'secret123';
 
 router.get('/', async (req, res) => {
     const users = await client.query("SELECT * FROM users");
     return res.send(users.rows);
 });
+
+router.get('/active', async (req, res) => {
+    const users = await client.query("SELECT * FROM active_users au LEFT JOIN users u ON u.user_id = au.active_user_id");
+    return res.send(users.rows);
+});
+
+
+router.delete('/active/:id', async  (req, res) => {
+	const id = req.params.id;
+
+    const response = await client.query("DELETE from active_users WHERE active_user_id = $1", [id]);
+
+
+    return response.rowCount > 0 ? res.sendStatus(200) : res.sendStatus(400); 
+})
+
 
 router.post('/login',async  (req, res) => {
 
@@ -30,6 +45,10 @@ router.post('/login',async  (req, res) => {
     }
 
 	if (passwordHash.verify(req.body.password, user.userpassword)) {
+		await client.query(
+			"INSERT INTO active_users (active_user_id) VALUES ($1)",
+			[user.user_id]
+		  );
 		const token = jsonwebtoken.sign({ user: req.body.username }, jwtSecret);
 		return res.json({ token:token, user: user });
 	}
@@ -113,9 +132,12 @@ router.delete('/:id', async  (req, res) => {
 
 
 	for (let row in result.rows) {
-		console.log(result.rows[row])
 		await client.query("DELETE from post_comments WHERE commented_post_id = $1", [result.rows[row].post_id])
 	}
+	for (let row in result.rows) {
+		await client.query("DELETE from reactions WHERE reaction_post_id = $1", [result.rows[row].post_id])
+	}
+	await client.query("DELETE from reactions WHERE reaction_user_id = $1", [id])
 	await client.query("DELETE from post_comments WHERE person_id = $1", [id])
 	await client.query("DELETE from post WHERE creator = $1", [id])
 

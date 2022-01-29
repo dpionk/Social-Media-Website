@@ -2,18 +2,21 @@ import axios from 'axios';
 import { Field, Formik } from 'formik';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
+import { AiFillDelete, AiFillEdit, AiOutlineLike, AiOutlineDislike } from 'react-icons/ai'
 import './Post.scss'
 
 function Post({ user, mqtt, isAdmin }) {
 
 	const history = useNavigate();
+	const [hasReactions, setHasReactions] = useState();
+	const [reactions, setReactions] = useState();
 	const [comments, setComments] = useState();
 	const [editingComment, setEditingComment] = useState([false, null]);
 	const [editingPost, setEditingPost] = useState(false);
 	const [post, setPost] = useState();
 	const { id } = useParams();
 
+	
 	const downloadPost = () => {
 		axios.get(`http://localhost:5000/posts/${id}`).then((response) => {
 			setPost(response.data[0])
@@ -45,6 +48,59 @@ function Post({ user, mqtt, isAdmin }) {
 			//setLoading(false);
 		})
 	}
+
+	const downloadReactions = () => {
+		axios.get(`http://localhost:5000/reactions/${id}`).then((response) => {
+			setHasReactions(response.data.filter((reaction) => {
+				return reaction.reaction_user_id === parseInt(user)
+			}))
+			setReactions(response.data.reduce((prev, curr) => {
+				if (curr.reaction_type in prev) {
+					prev[curr.reaction_type]++
+				  }
+				  else {
+					prev[curr.reaction_type] = 1
+				  }
+				  return prev
+			}, {}))
+			console.log(hasReactions)
+		}).catch(error => {
+			console.log(error)
+		}).finally(() => {
+			//setLoading(false);
+		})
+	}
+
+	const submitReaction = (value) => {
+		
+		const values = {
+			author: user,
+			type: value
+		}
+		if (hasReactions.length !== 0) {
+			axios.put(`http://localhost:5000/reactions/${id}`, values).then(() => {
+				mqtt.publish(`reactions/${id}`, JSON.stringify(values));
+			}).catch(error => {
+				console.log(error)
+				alert('Coś poszło nie tak')
+			}).finally(() => {
+				//setLoading(false);
+			})
+
+		}
+
+		else {
+		axios.post(`http://localhost:5000/reactions/${id}`, values).then(() => {
+			mqtt.publish(`reactions/${id}`, JSON.stringify(values));
+		}).catch(error => {
+			console.log(error)
+			alert('Coś poszło nie tak')
+		}).finally(() => {
+			//setLoading(false);
+		})
+	}
+	}
+
 
 	const deleteComment = (id) => {
 		axios.delete(`http://localhost:5000/comments/${id}`).then(() => {
@@ -111,13 +167,14 @@ function Post({ user, mqtt, isAdmin }) {
 	useEffect(() => {
 		downloadPost();
 		downloadComments();
-
+		downloadReactions();
 	}, [id]
 
 	
 	);
 
 	useEffect(() => {
+		
 		
 		mqtt.subscribe(`comment/${id}`);
 		const handleMessage = (topic, comment) => {
@@ -135,7 +192,24 @@ function Post({ user, mqtt, isAdmin }) {
 
 	}, [mqtt, id]);
 
+	useEffect(() => {
+		
+		mqtt.subscribe(`reactions/${id}`);
+		const handleMessage = (topic, reaction) => {
+			if (topic !== `reactions/${id}`) return;
+			downloadReactions();
+		};
 
+		mqtt.addMessageHandler(handleMessage);
+
+		return () => {
+			mqtt.unsubscribe(`reactions/${id}`);
+			mqtt.removeMessageHandler(handleMessage);
+		}
+
+	}, [mqtt, id]);
+
+	console.log(reactions)
 	return (
 		<div className='post-container'>
 			{post && comments &&
@@ -180,12 +254,21 @@ function Post({ user, mqtt, isAdmin }) {
 										)
 									}
 								</Formik>
+								
 							</div>
-
-
-
-
-						}</div>
+						
+						}
+						
+						
+						</div>
+						
+							{ reactions && 
+							<div className='reactions'> 
+							{reactions.like ? reactions.like : 0}<button type='button' className={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'like' ? 'btn like' : 'btn'} onClick={() => submitReaction('like')}><AiOutlineLike/></button>
+							{reactions.dislike ? reactions.dislike : 0}<button type='button' className={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'dislike' ? 'btn dislike' : 'btn'}  onClick={() => submitReaction('dislike')}><AiOutlineDislike/></button>
+							</div>
+						}
+						
 					</div>
 					<div className='comments'>
 						<div className='title'>Komentarze</div>

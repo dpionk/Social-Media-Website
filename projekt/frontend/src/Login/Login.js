@@ -7,19 +7,18 @@ import './Login.scss'
 
 
 
-function Login({ setToken, setUser, setIsAdmin, active, setActiveUsers, mqtt }) {
+function Login({ setToken, setUser, setIsAdmin, active, setActiveUsers, mqtt, getActiveUsers }) {
 
 	const [username, setUserName] = useState();
 	const [password, setPassword] = useState();
 
-	console.log(active)
 	useEffect(() => {
 		
 		mqtt.subscribe("active");
 
-		const handleMessage = (topic, user) => {
+		const handleMessage = async (topic, user) => {
 			if (topic !== "active") return;
-			setActiveUsers((activeUsers) => [...activeUsers, JSON.parse(user)]);
+			await getActiveUsers();
 		};
 
 		mqtt.addMessageHandler(handleMessage);
@@ -29,7 +28,7 @@ function Login({ setToken, setUser, setIsAdmin, active, setActiveUsers, mqtt }) 
 		//	mqtt.removeMessageHandler(handleMessage);
 		//}
 
-	}, [mqtt, setActiveUsers]);
+	}, [mqtt, getActiveUsers]);
 
 	const handleValidateRegister = (values) => {
 		const errors = {};

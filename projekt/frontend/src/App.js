@@ -13,6 +13,7 @@ import Settings from './Settings/Settings';
 import PageNotFound from './PageNotFound/PageNotFound'
 
 import './App.scss'
+import axios from 'axios';
 
 
 function App() {
@@ -24,8 +25,20 @@ function App() {
 	
 	const ENDPOINT = "http://127.0.0.1:4001";
 
+	const getActiveUsers = () => {
+		axios.get(`http://localhost:5000/users/active`).then((response) => {
+			console.log(response.data)
+			setActiveUsers(response.data)
+		}).catch(error => {
+			console.log(error)
+		}).finally(() => {
+			//setLoading(false);
+		})
 
+	}
 	useEffect(() => {
+
+
 		const socket = socketIOClient(ENDPOINT);
 		const mqtt = {
 			publish: function(topic, message) {
@@ -51,11 +64,13 @@ function App() {
 				messageHandler(topic, message.toString());
 			}
 		});
+
+		
 	}, []);
 
 	if (!mqtt) return <div>Loading MQTT...</div>;
 	if (!token && !user) {
-		return <Login setToken={setToken} setUser={setUser} mqtt={mqtt} setActiveUsers={setActiveUsers} active={activeUsers} setIsAdmin={setIsAdmin} />
+		return <Login setToken={setToken} setUser={setUser} mqtt={mqtt} setActiveUsers={setActiveUsers} active={activeUsers} setIsAdmin={setIsAdmin} getActiveUsers={getActiveUsers} />
 	}
 
 	return (

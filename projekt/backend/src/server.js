@@ -17,6 +17,7 @@ const client = require('./config/psqlClient');
 const users = require('./routes/users');
 const posts = require('./routes/posts');
 const comments = require('./routes/comments');
+const reactions = require('./routes/reactions')
 
 
 
@@ -35,8 +36,8 @@ app.use(function (req, res, next) {
 app.use('/users', users);
 app.use('/posts', posts);
 app.use('/comments', comments);
+app.use('/reactions', reactions);
 
-let activeUsers = []
 
 
 client
@@ -70,6 +71,20 @@ client
     person_id INTEGER NOT NULL, 
     FOREIGN KEY (person_id) REFERENCES users (user_id),
     FOREIGN KEY (commented_post_id) REFERENCES post (post_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS active_users (
+    active_user_id INTEGER NOT NULL, 
+    FOREIGN KEY (active_user_id) REFERENCES users (user_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS reactions (
+	reaction_id SERIAL PRIMARY KEY,
+    reaction_user_id INTEGER NOT NULL, 
+	reaction_post_id INTEGER NOT NULL, 
+	reaction_type VARCHAR NOT NULL,
+	FOREIGN KEY (reaction_post_id) REFERENCES post (post_id),
+    FOREIGN KEY (reaction_user_id) REFERENCES users (user_id)
   );
 
   INSERT INTO users (username, role, userpassword, first_name, last_name) VALUES ('admin123', 'admin', 'sha1$3b1e2197$1$b9c5f33b4373a48531bf52162e9908746ed83a13', 'admin', 'adminowski');
@@ -140,77 +155,6 @@ io.on('connection', async (socket) => {
 	});
 
 
-	// socket.on('active', (data) => {
-	// 	activeUsers.push(data)
-		
-	// 	// MQTTclient.publish('active', JSON.stringify(data));
-
-	// 	// MQTTclient.on('message', (t, m) => {
-	// 	// 	if (t === 'active') {
-				
-	// 	// 		socket.emit('active', activeUsers)
-	// 	// 		//MQTTclient.end()
-	// 	// 	}
-	// 	// })
-	// })
-
-	// socket.on('logout', (data) => {
-	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
-	// 	MQTTclient.subscribe('logout');
-	// 	MQTTclient.publish('logout', JSON.stringify(data));
-
-	// 	MQTTclient.on('message', (t, m) => {
-	// 		if (t === 'logout') {
-	// 			activeUsers = activeUsers.filter((user) => {
-	// 				return user.user_id !== data
-	// 			})
-	// 			socket.emit('active', activeUsers)
-	// 			MQTTclient.end()
-	// 		}
-	// 	})
-	// })
-
-	// socket.on('message', (data) => {
-	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
-
-	// 	MQTTclient.subscribe('chat');
-	// 	MQTTclient.publish('chat', JSON.stringify(data));
-
-	// 	MQTTclient.on('message', (t, m) => {
-	// 		if (t === 'chat') {
-	// 			socket.emit('message', data)
-	// 			//MQTTclient.end()
-	// 		}
-	// 	})
-	// })
-
-	// socket.on('post', (data) => {
-	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
-
-	// 	MQTTclient.subscribe('post');
-	// 	MQTTclient.publish('post', JSON.stringify(data));
-
-	// 	MQTTclient.on('message', (t, m) => {
-	// 		if (t === 'post') {
-	// 			socket.emit('post', data)
-	// 			MQTTclient.end()
-	// 		}
-	// 	})
-	// })
-
-	// socket.on('comment', (data) => {
-	// 	const MQTTclient = mqtt.connect('ws://localhost:8082/mqtt');
-
-	// 	MQTTclient.subscribe('comment');
-	// 	MQTTclient.publish('comment', JSON.stringify(data));
-
-	// 	MQTTclient.on('message', (t, m) => {
-	// 		if (t === 'comment') {
-	// 			socket.emit('comment', data)
-	// 			MQTTclient.end()
-	// 		}
-	// 	})
-	// })
 });
 
 server.listen(4001, () => console.log(`Socket listening on port 4001`));

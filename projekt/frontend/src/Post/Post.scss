@@ -69,6 +69,16 @@
       padding: 20px;
       background-color: white;
 
+	  .reactions {
+		  .like {
+			  color: green;
+		  }
+
+		  .dislike {
+			color: red;
+		  }
+	  }
+
       .edit-post {
         display: flex;
         justify-content: space-between;
