@@ -5,15 +5,33 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 function Main({ user, activeUsers, mqtt }) {
+
+
 	const [newestPosts, setNewestPosts] = useState([]);
 
+	const downloadPosts = () => {
+		axios.get(`http://localhost:5000/posts/`).then((response) => {
+			setNewestPosts(response.data.sort((a, b) => {
+
+				return (a.post_creation_date < b.post_creation_date) ? 1 : -1
+			}))
+		}).catch(error => {
+			console.log(error)
+		}).finally(() => {
+			//setLoading(false);
+		})
+	}
 
 	useEffect(() => {
-		
+		downloadPosts();
+	}, []);
+	useEffect(() => {
+
 		mqtt.subscribe("post");
 		const handlePost = (topic, post) => {
 			if (topic !== "post") return;
-			setNewestPosts((newestPosts) => [...newestPosts, JSON.parse(post)]);
+			//setNewestPosts((newestPosts) => [ JSON.parse(post), ...newestPosts]);
+			downloadPosts();
 		};
 
 		mqtt.addMessageHandler(handlePost);
@@ -25,7 +43,7 @@ function Main({ user, activeUsers, mqtt }) {
 
 	}, [mqtt]);
 
-
+	console.log(newestPosts)
 
 
 	const handleValidate = (values) => {
@@ -41,6 +59,7 @@ function Main({ user, activeUsers, mqtt }) {
 	}
 
 	const createPost = async (values) => {
+
 		axios.post('http://localhost:5000/posts', values).then((data) => {
 			mqtt.publish("post", JSON.stringify(values));
 			alert('Dodano')
@@ -63,7 +82,14 @@ function Main({ user, activeUsers, mqtt }) {
 					<Formik
 						enableReinitialize
 						validate={handleValidate}
-						onSubmit={handleSubmit}
+						onSubmit={(values, {resetForm} ) => {handleSubmit(values); resetForm(
+							{
+								title: '',
+								release_date: '',
+								post_content: '',
+								creator: user,
+							}
+						)}}
 						initialValues={
 							{
 								title: '',
@@ -98,27 +124,30 @@ function Main({ user, activeUsers, mqtt }) {
 			</div>
 			<div className='active-feed'>
 				<div className='activeUsers list-group-item'>
-						<h4>Aktywni użytkownicy</h4>
+					<h4>Aktywni użytkownicy</h4>
 					<div className='users-list'>
-						{activeUsers.length !== 0  && activeUsers.map((user) => {
+						{activeUsers.length !== 0 && activeUsers.map((user) => {
 							return (
-							<div className='active-user' key={user.user_id}>
-								<div className='active'/>
-								<div className='user'><Link to={`/users/${user.user_id}`}>{user.username}</Link></div>
-							</div>
+								<div className='active-user' key={user.user_id}>
+									<div className='active' />
+									<div className='user'><Link to={`/users/${user.user_id}`}>{user.username}</Link></div>
+								</div>
 							)
 						})}
 					</div>
 				</div>
 				<div className='feed list-group-item'>
-				<h4>Najnowsze posty</h4>
+					<h4>Najnowsze posty</h4>
 					<div className='users-list'>
 						{newestPosts.length !== 0 && newestPosts.map((post) => {
 							return (
-							<div className='active-user' key={Math.random()}>
-								<div className='active'/>
-								<div className='user'><Link to={`/users/${post.creator}`}>{post.title}</Link></div>
-							</div>
+								<div className='active-user' key={post.post_id}>
+									<div className='active' />
+									<div className='user'>
+									<img src={post.picture ? post.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
+										<Link to={`/posts/${post.post_id}`}>{post.title}</Link>
+									</div>
+								</div>
 							)
 						})}
 					</div>

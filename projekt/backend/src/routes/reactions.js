@@ -28,18 +28,16 @@ router.put('/:id', async  (req, res) => {
 	const id = req.params.id;
 
 
-	console.log(req.body, id)
 	const result = await client.query(`UPDATE reactions SET reaction_type = $1 WHERE reaction_post_id = $2 AND reaction_user_id = $3 `,
 	
 	[req.body.type, id, req.body.author]
 );
-
 	return result.rowCount > 0 ? res.send('Updated') : res.sendStatus(400);
 })
 
-router.delete('/:id', async (req,res) => {
-	const id = req.params.id;
-    const response = await client.query("DELETE from reactions WHERE reaction_id = $1", [id]);
+router.delete('/:idPost', async (req,res) => {
+	const id = req.params.idPost;
+    const response = await client.query("DELETE from reactions WHERE reaction_post_id = $1 AND reaction_user_id = $2", [id, req.body.author]);
 
     return response.rowCount > 0 ? res.sendStatus(200) : res.sendStatus(400); 
 })

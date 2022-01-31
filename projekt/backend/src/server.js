@@ -57,8 +57,8 @@ client
 
   CREATE TABLE IF NOT EXISTS post (
     post_id SERIAL PRIMARY KEY,
+	post_creation_date TIMESTAMP NOT NULL,
     title VARCHAR NOT NULL,
-    release_date DATE NOT NULL,
     post_content VARCHAR NOT NULL,
     creator INTEGER NULL, 
     FOREIGN KEY (creator) REFERENCES users (user_id)
@@ -66,6 +66,7 @@ client
 
   CREATE TABLE IF NOT EXISTS post_comments (
     comment_id SERIAL PRIMARY KEY,
+	comment_creation_date TIMESTAMP NOT NULL,
    	comment_content VARCHAR NOT NULL,
     commented_post_id INTEGER NOT NULL,
     person_id INTEGER NOT NULL, 

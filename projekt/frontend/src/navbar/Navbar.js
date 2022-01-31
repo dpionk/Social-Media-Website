@@ -77,7 +77,7 @@ function Navbar({ user, mqtt, setActiveUsers }) {
 							</li>
 							<li className='nav-item'>
 								<Link to="/chatrooms" style={{ textDecoration: 'none' }}>
-									<div className="nav-link">Chat</div>
+									<div className="nav-link">Chaty</div>
 								</Link>
 							</li>
 
@@ -95,6 +95,12 @@ function Navbar({ user, mqtt, setActiveUsers }) {
 							</li>
 
 						</ul>
+						<div className='search'>
+							<form className="form-inline">
+								<input className="form-control mr-sm-2" type="search" placeholder="wyszukaj użytkownika..." aria-label="Search" />
+								<button className="btn btn-outline-success my-2 my-sm-0" type="button">szukaj</button>
+							</form>
+						</div>
 					</div>
 				</div>
 			</nav>

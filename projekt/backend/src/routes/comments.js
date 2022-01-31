@@ -15,8 +15,8 @@ router.get('/:idPost', async (req, res) => {
 
 router.post('/:idPost', async (req, res) => {
 	const insertedCommentRows = await client.query(
-        "INSERT INTO post_comments (comment_content, commented_post_id, person_id) VALUES ($1, $2, $3) RETURNING *",
-        [req.body.content, req.params.idPost, req.body.author]
+        "INSERT INTO post_comments (comment_content, comment_creation_date, commented_post_id, person_id) VALUES ($1, $2, $3, $4) RETURNING *",
+        [req.body.content, req.body.comment_creation_date, req.params.idPost, req.body.author]
       );
 
     const insertedComment= insertedCommentRows.rows[0];

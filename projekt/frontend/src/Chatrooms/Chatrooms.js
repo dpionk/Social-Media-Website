@@ -3,10 +3,11 @@ import { Field, Formik } from 'formik';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './Chatrooms.scss'
+import Chatroom from './Chatroom';
 
 function Chatrooms({ mqtt, user }) {
 
-	const [messages, setMessages] = useState([{ 'id' : 'bot', 'author': 'Chat bot', 'message': 'Witaj na chacie ogólnym :)' }]);
+	const [chatRoom, setChatRoom] = useState(null)
 	const [userInfo,setUserInfo] = useState(null);
 
 	const downloadUser = () => {
@@ -19,69 +20,27 @@ function Chatrooms({ mqtt, user }) {
 		})
 	}
 
+
 	useEffect(() => {
 		downloadUser();
 	}, []);
 
-
-	useEffect(() => {
-		
-		mqtt.subscribe("chat");
-		const handleMessage = (topic, message) => {
-			if (topic !== "chat") return;
-			setMessages((messages) => [...messages, JSON.parse(message)]);
-		};
-
-		mqtt.addMessageHandler(handleMessage);
-
-		return () => {
-			mqtt.unsubscribe("chat");
-			mqtt.removeMessageHandler(handleMessage);
-		}
-
-	}, [mqtt]);
-
-
-
-	//useEffect(() => {
-	//	downloadUser();
-	//	socket.on('message', data => {
-	//		setMessages([...messages, data])
-	//	});
-	//}, [messages]);
-
-
-
-	const handleSubmit = values => {
-		// socket.emit('message', values);
-		mqtt.publish("chat", JSON.stringify(values));
+	if (chatRoom) {
+		return <Chatroom mqtt={mqtt} user={user} userInfo={userInfo} chatroom={chatRoom} setChatroom={setChatRoom}/>
 	}
-
 	return (
 		<div className='chatroom'>
 			{ userInfo && 
 			<div className='container'>
-			<h4>Chat ogólny</h4>
-			<div className='messages'>
-			{messages.map(message => {
-				return (
-					<div className='message list-group-item' key={Math.random()}>
-							<p>{ message.id !== 'bot' ? <Link to={`/users/${message.id}`}>{message.author}</Link> : message.author }</p>
-							<p>{message.message}</p>
-					</div>
-				)
-			})}
-			</div>
+			<h4>Witaj! Wpisz nazwę pokoju, do którego chcesz dołączyć</h4>
 			<div className='form'>
 				<Formik
 					enableReinitialize
 					//validate={handleValidateRegister}
-					onSubmit={handleSubmit}
+					onSubmit={(values) => setChatRoom(values.room)}
 					initialValues={
 						{
-							id: user,
-							author: userInfo.username,
-							message: ''
+							room: ''
 						}
 					}
 				>
@@ -90,9 +49,9 @@ function Chatrooms({ mqtt, user }) {
 							<form>
 								
 								<div className='form-group'>
-									<Field type='text' as='textarea' className='form-control' name='message' placeholder='wpisz wiadomość...' >
+									<Field type='text' className='form-control' name='room' placeholder='wpisz nazwę pokoju...' >
 									</Field>
-									{formProps.touched.message && formProps.errors.message ? <div>{formProps.errors.message}</div> : null}
+									{formProps.touched.room && formProps.errors.room ? <div>{formProps.errors.room}</div> : null}
 								</div>
 								<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
 							</form>

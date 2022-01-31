@@ -83,7 +83,7 @@ function App() {
 						<Route exact path='/' element={<Main user={user} mqtt={mqtt} activeUsers={activeUsers}/>}></Route>
 						<Route exact path='/chatrooms' element={<Chatrooms  user={user} mqtt={mqtt}/>}></Route>
 						<Route exact path='/posts/:id' element={<Post user={user} mqtt={mqtt} isAdmin={isAdmin}/>}></Route>
-						<Route exact path='/settings' element={<Settings user={user}/>}></Route>
+						<Route exact path='/settings' element={<Settings user={user} mqtt={mqtt}/>}></Route>
 						<Route path='*' element={<PageNotFound />} />
 					</Routes>
 				</div>

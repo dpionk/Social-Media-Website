@@ -44,8 +44,29 @@ function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 
 	}, [mqtt, setActiveUsers]);
 
-	const logout = (user) => {
-		mqtt.publish("logout", user);
+	console.log(posts)
+	const logout = () => {
+		axios.delete(`http://localhost:5000/users/active/${user.user_id}`).then(() => {
+			mqtt.publish("logout", JSON.stringify(user.user_id));
+		}).catch((error) => {
+			console.log(error)
+			alert('Coś poszło nie tak')
+		})
+
+	}
+
+	const deleteUser =  async () => {
+		await logout();
+		axios.delete(`http://localhost:5000/users/${user.user_id}`).then(async () => {
+			
+			alert('Usunięto profil :(')
+			history('/')
+			
+		}).catch(error => {
+			console.log(error)
+		}).finally(() => {
+			//setLoading(false);
+		})
 	}
 
 	const downloadUser = () => {
@@ -68,20 +89,6 @@ function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 		})
 	}
 
-
-	const deleteUser =  () => {
-		axios.delete(`http://localhost:5000/users/${id}`).then(async () => {
-			await logout(id);
-			alert('Usunięto profil :(')
-			history('/')
-			
-			
-		}).catch(error => {
-			console.log(error)
-		}).finally(() => {
-			//setLoading(false);
-		})
-	}
 
 	useEffect(() => {
 		downloadUser();
@@ -147,7 +154,7 @@ function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 										{user.username} {user.role === 'admin' ? <GrUserAdmin /> : null}
 									</div>
 									<div className="button-back">
-									{parseInt(userSession) === user.user_id || isAdmin === true ?  <button className="btn" type="button" onClick={deleteUser}><AiFillDelete /></button> : null}
+									{isAdmin === true ?  <button className="btn" type="button" onClick={deleteUser}><AiFillDelete /></button> : null}
 										<button className="btn" type="button" onClick={() => { history(-1); }}><RiArrowGoBackLine /></button>
 									</div>
 								</div>
@@ -165,7 +172,7 @@ function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 							</div>
 							<div className='posts-list'>
 								<ul>
-									{posts.map((post) => {
+									{	posts.map((post) => {
 										return (
 											<li className='post' key={post.post_id}>
 												<div className='edit-post'>
@@ -177,6 +184,9 @@ function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 												<div className='content'>{post.post_content}</div>
 											</li>
 										)
+									}).sort((a, b) => {
+										
+										return (a.post_creation_date  > b.post_creation_date) ? 1 : -1
 									})}
 								</ul>
 							</div>

@@ -16,7 +16,7 @@ function Post({ user, mqtt, isAdmin }) {
 	const [post, setPost] = useState();
 	const { id } = useParams();
 
-	
+	console.log(post)
 	const downloadPost = () => {
 		axios.get(`http://localhost:5000/posts/${id}`).then((response) => {
 			setPost(response.data[0])
@@ -40,8 +40,13 @@ function Post({ user, mqtt, isAdmin }) {
 	}
 
 	const downloadComments = () => {
+		console.log(comments)
 		axios.get(`http://localhost:5000/comments/${id}`).then((response) => {
-			setComments(response.data)
+			setComments(response.data.sort((a, b) => {
+				console.log(a, b)
+				return (a.comment_id > b.comment_id) ? 1 : -1
+
+			}))
 		}).catch(error => {
 			console.log(error)
 		}).finally(() => {
@@ -57,13 +62,12 @@ function Post({ user, mqtt, isAdmin }) {
 			setReactions(response.data.reduce((prev, curr) => {
 				if (curr.reaction_type in prev) {
 					prev[curr.reaction_type]++
-				  }
-				  else {
+				}
+				else {
 					prev[curr.reaction_type] = 1
-				  }
-				  return prev
+				}
+				return prev
 			}, {}))
-			console.log(hasReactions)
 		}).catch(error => {
 			console.log(error)
 		}).finally(() => {
@@ -72,7 +76,7 @@ function Post({ user, mqtt, isAdmin }) {
 	}
 
 	const submitReaction = (value) => {
-		
+
 		const values = {
 			author: user,
 			type: value
@@ -90,15 +94,25 @@ function Post({ user, mqtt, isAdmin }) {
 		}
 
 		else {
-		axios.post(`http://localhost:5000/reactions/${id}`, values).then(() => {
-			mqtt.publish(`reactions/${id}`, JSON.stringify(values));
+			axios.post(`http://localhost:5000/reactions/${id}`, values).then(() => {
+				mqtt.publish(`reactions/${id}`, JSON.stringify(values));
+			}).catch(error => {
+				console.log(error)
+				alert('Coś poszło nie tak')
+			}).finally(() => {
+				//setLoading(false);
+			})
+		}
+	}
+
+	const deleteReaction = () => {
+		axios.delete(`http://localhost:5000/reactions/${id}`, { data: { author: user } }).then(() => {
+			mqtt.publish(`reactions/${id}`, JSON.stringify({ deleted_reaction: user }));
 		}).catch(error => {
 			console.log(error)
-			alert('Coś poszło nie tak')
 		}).finally(() => {
 			//setLoading(false);
 		})
-	}
 	}
 
 
@@ -114,6 +128,9 @@ function Post({ user, mqtt, isAdmin }) {
 	}
 
 	const handleSubmit = (values) => {
+		const now = new Date();
+		now.setTime(now.getTime());
+		values.comment_creation_date = now
 		axios.post(`http://localhost:5000/comments/${id}`, values).then(() => {
 			mqtt.publish(`comment/${id}`, JSON.stringify(values));
 		}).catch(error => {
@@ -170,12 +187,12 @@ function Post({ user, mqtt, isAdmin }) {
 		downloadReactions();
 	}, [id]
 
-	
+
 	);
 
 	useEffect(() => {
-		
-		
+
+
 		mqtt.subscribe(`comment/${id}`);
 		const handleMessage = (topic, comment) => {
 			if (topic !== `comment/${id}`) return;
@@ -193,7 +210,7 @@ function Post({ user, mqtt, isAdmin }) {
 	}, [mqtt, id]);
 
 	useEffect(() => {
-		
+
 		mqtt.subscribe(`reactions/${id}`);
 		const handleMessage = (topic, reaction) => {
 			if (topic !== `reactions/${id}`) return;
@@ -209,14 +226,19 @@ function Post({ user, mqtt, isAdmin }) {
 
 	}, [mqtt, id]);
 
-	console.log(reactions)
+	console.log(comments)
 	return (
 		<div className='post-container'>
 			{post && comments &&
 				<div className='post-comments'>
 					<div className='post' key={post.post_id}>
 						<div className='edit-post'>
-							<div className='title'>{!editingPost ? post.title : null}
+							<div className='title'>
+								<div className='picture-user'>
+								<img src={post.picture ? post.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
+								<Link to={`/users/${post.creator}`}>{post.username}</Link>
+								</div>
+								{!editingPost ? post.title : null}
 								{parseInt(user) === post.creator ? <button className="btn" type="button" onClick={() => { setEditingPost(!editingPost) }}><AiFillEdit /></button> : null}
 								{parseInt(user) === post.creator || isAdmin === true ? <button className="btn" type="button" onClick={() => { deletePost(post.post_id) }}><AiFillDelete /></button> : null}
 							</div>
@@ -254,21 +276,21 @@ function Post({ user, mqtt, isAdmin }) {
 										)
 									}
 								</Formik>
-								
+
 							</div>
-						
+
 						}
-						
-						
+
+
 						</div>
-						
-							{ reactions && 
-							<div className='reactions'> 
-							{reactions.like ? reactions.like : 0}<button type='button' className={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'like' ? 'btn like' : 'btn'} onClick={() => submitReaction('like')}><AiOutlineLike/></button>
-							{reactions.dislike ? reactions.dislike : 0}<button type='button' className={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'dislike' ? 'btn dislike' : 'btn'}  onClick={() => submitReaction('dislike')}><AiOutlineDislike/></button>
+
+						{reactions &&
+							<div className='reactions'>
+								{reactions.like ? reactions.like : 0}<button type='button' className={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'like' ? 'btn like' : 'btn'} onClick={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'like' ? () => deleteReaction() : () => submitReaction('like')}><AiOutlineLike /></button>
+								{reactions.dislike ? reactions.dislike : 0}<button type='button' className={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'dislike' ? 'btn dislike' : 'btn'} onClick={hasReactions.length !== 0 && hasReactions[0].reaction_type === 'dislike' ? () => deleteReaction() : () => submitReaction('dislike')}><AiOutlineDislike /></button>
 							</div>
 						}
-						
+
 					</div>
 					<div className='comments'>
 						<div className='title'>Komentarze</div>
@@ -321,7 +343,12 @@ function Post({ user, mqtt, isAdmin }) {
 				<Formik
 					enableReinitialize
 					validate={handleValidate}
-					onSubmit={handleSubmit}
+					onSubmit={(values, {resetForm} ) => {handleSubmit(values); resetForm(
+						{
+							author: user,
+							content: ''
+						}
+					)}}
 					initialValues={
 						{
 							author: user,

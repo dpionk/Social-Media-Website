@@ -114,7 +114,14 @@ function Login({ setToken, setUser, setIsAdmin, active, setActiveUsers, mqtt, ge
 						<Formik
 							enableReinitialize
 							validate={handleValidateRegister}
-							onSubmit={handleSubmitRegister}
+							onSubmit={(values, {resetForm} ) => {handleSubmitRegister(values); resetForm(
+								{
+									username: '',
+									password: '',
+									first_name: '',
+									last_name: ''
+								}
+							)}}
 							initialValues={
 								{
 									username: '',
