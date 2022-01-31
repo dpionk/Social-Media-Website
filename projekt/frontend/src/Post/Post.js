@@ -300,7 +300,7 @@ function Post({ user, mqtt, isAdmin }) {
 									<div>
 										<img src={comment.picture ? comment.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
 										<Link style={{ textDecoration: 'none', color:'black'}} to={`/users/${comment.user_id}`}>{comment.username} </Link>
-									</div> {parseInt(user) === comment.person_id || isAdmin === true ? <div><button className="btn" type="button" onClick={() => { deleteComment(comment.comment_id) }}><AiFillDelete /></button><button className="btn" type="button" onClick={() => { ; if (!editingComment[0]) { setEditingComment([true, comment.comment_id]) } else { setEditingComment([false, null]); } }}><AiFillEdit /></button></div> : null}
+									</div> <div>{parseInt(user) === comment.person_id || isAdmin === true ? <button className="btn" type="button" onClick={() => { deleteComment(comment.comment_id) }}><AiFillDelete /></button> : null}{parseInt(user) === comment.person_id && <button className="btn" type="button" onClick={() => { ; if (!editingComment[0]) { setEditingComment([true, comment.comment_id]) } else { setEditingComment([false, null]); } }}><AiFillEdit /></button>}</div>
 								</div>
 								<div> {editingComment[0] && editingComment[1] === comment.comment_id ?
 

@@ -133,7 +133,8 @@ function Main({ user, activeUsers, mqtt }) {
 									<div className='user'><Link style={{ textDecoration: 'none', color:'black'}} to={`/users/${user.user_id}`}>{user.username}</Link></div>
 								</div>
 							)
-						})}
+						})
+					}
 					</div>
 				</div>
 				<div className='feed list-group-item'>
