@@ -35,13 +35,13 @@ function Chatroom({ mqtt, user, userInfo, chatroom, setChatroom }) {
 				<div className='container'>
 					<div className='room-quit'>
 						<h4>{chatroom}</h4>
-						<button className=' btn btn-primary' onClick={() => { mqtt.unsubscribe(`chat/${chatroom}`); setChatroom(null) }}><ImExit /></button>
+						<button className=' btn ' onClick={() => { mqtt.unsubscribe(`chat/${chatroom}`); setChatroom(null) }}><ImExit /></button>
 					</div>
 					<div className='messages'>
 						{messages.map(message => {
 							return (
 								<div className='message list-group-item' key={Math.random()}>
-									<p>{message.id !== 'bot' ? <Link to={`/users/${message.id}`}>{message.author}</Link> : message.author}</p>
+									<p>{message.id !== 'bot' ? <Link style={{ textDecoration: 'none', color:'black'}} to={`/users/${message.id}`}>{message.author}</Link> : message.author}</p>
 									<p>{message.message}</p>
 								</div>
 							)
@@ -75,7 +75,7 @@ function Chatroom({ mqtt, user, userInfo, chatroom, setChatroom }) {
 											</Field>
 											{formProps.touched.message && formProps.errors.message ? <div>{formProps.errors.message}</div> : null}
 										</div>
-										<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
+										<button type='button' className='btn ' onClick={formProps.handleSubmit}>Zatwierdź</button>
 									</form>
 								)
 							}

@@ -236,7 +236,7 @@ function Post({ user, mqtt, isAdmin }) {
 							<div className='title'>
 								<div className='picture-user'>
 								<img src={post.picture ? post.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
-								<Link to={`/users/${post.creator}`}>{post.username}</Link>
+								<Link style={{ textDecoration: 'none', color:'black'}} to={`/users/${post.creator}`}>{post.username}</Link>
 								</div>
 								{!editingPost ? post.title : null}
 								{parseInt(user) === post.creator ? <button className="btn" type="button" onClick={() => { setEditingPost(!editingPost) }}><AiFillEdit /></button> : null}
@@ -271,7 +271,7 @@ function Post({ user, mqtt, isAdmin }) {
 													</Field>
 													{formProps.touched.post_contentt && formProps.errors.post_content ? <div>{formProps.errors.post_content}</div> : null}
 												</div>
-												<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
+												<button type='button' className='btn ' onClick={formProps.handleSubmit}>Zatwierdź</button>
 											</form>
 										)
 									}
@@ -299,7 +299,7 @@ function Post({ user, mqtt, isAdmin }) {
 								<div className='img-author'>
 									<div>
 										<img src={comment.picture ? comment.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
-										<Link to={`/users/${comment.user_id}`}>{comment.username} </Link>
+										<Link style={{ textDecoration: 'none', color:'black'}} to={`/users/${comment.user_id}`}>{comment.username} </Link>
 									</div> {parseInt(user) === comment.person_id || isAdmin === true ? <div><button className="btn" type="button" onClick={() => { deleteComment(comment.comment_id) }}><AiFillDelete /></button><button className="btn" type="button" onClick={() => { ; if (!editingComment[0]) { setEditingComment([true, comment.comment_id]) } else { setEditingComment([false, null]); } }}><AiFillEdit /></button></div> : null}
 								</div>
 								<div> {editingComment[0] && editingComment[1] === comment.comment_id ?
@@ -325,7 +325,7 @@ function Post({ user, mqtt, isAdmin }) {
 															</Field>
 															{formProps.touched.content && formProps.errors.content ? <div>{formProps.errors.content}</div> : null}
 														</div>
-														<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
+														<button type='button' className='btn ' onClick={formProps.handleSubmit}>Zatwierdź</button>
 													</form>
 												)
 											}
@@ -364,7 +364,7 @@ function Post({ user, mqtt, isAdmin }) {
 									</Field>
 									{formProps.touched.content && formProps.errors.content ? <div>{formProps.errors.content}</div> : null}
 								</div>
-								<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
+								<button type='button' className='btn ' onClick={formProps.handleSubmit}>Zatwierdź</button>
 							</form>
 						)
 					}

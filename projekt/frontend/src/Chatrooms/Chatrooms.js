@@ -53,7 +53,7 @@ function Chatrooms({ mqtt, user }) {
 									</Field>
 									{formProps.touched.room && formProps.errors.room ? <div>{formProps.errors.room}</div> : null}
 								</div>
-								<button type='button' className='btn btn-primary' onClick={formProps.handleSubmit}>Zatwierdź</button>
+								<button type='button' className='btn ' onClick={formProps.handleSubmit}>Zatwierdź</button>
 							</form>
 						)
 					}

@@ -5,7 +5,14 @@
 }
 
 body {
-  background-color: $blue-100;
+
+	font-family: Roboto, Helvetica, Arial, sans-serif;
+	background-color: #D3E4CD;
+}
+
+.list-group-item {
+	background-color: #FEF5ED ;
+
 }
 
 .App {

@@ -115,7 +115,7 @@ function Main({ user, activeUsers, mqtt }) {
 										</Field>
 										{formProps.touched.post_content && formProps.errors.post_content ? <div>{formProps.errors.post_content}</div> : null}
 									</div>
-									<button type="button" className="btn btn-primary" onClick={formProps.handleSubmit}>Zatwierdź</button>
+									<button type="button" className="btn" onClick={formProps.handleSubmit}>Zatwierdź</button>
 								</form>
 							)
 						}
@@ -130,7 +130,7 @@ function Main({ user, activeUsers, mqtt }) {
 							return (
 								<div className='active-user' key={user.user_id}>
 									<div className='active' />
-									<div className='user'><Link to={`/users/${user.user_id}`}>{user.username}</Link></div>
+									<div className='user'><Link style={{ textDecoration: 'none', color:'black'}} to={`/users/${user.user_id}`}>{user.username}</Link></div>
 								</div>
 							)
 						})}
@@ -142,10 +142,9 @@ function Main({ user, activeUsers, mqtt }) {
 						{newestPosts.length !== 0 && newestPosts.map((post) => {
 							return (
 								<div className='active-user' key={post.post_id}>
-									<div className='active' />
 									<div className='user'>
 									<img src={post.picture ? post.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
-										<Link to={`/posts/${post.post_id}`}>{post.title}</Link>
+										<Link style={{ textDecoration: 'none', color:'black'}} to={`/posts/${post.post_id}`}>{post.title}</Link>
 									</div>
 								</div>
 							)

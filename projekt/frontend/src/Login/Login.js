@@ -107,7 +107,7 @@ function Login({ setToken, setUser, setIsAdmin, active, setActiveUsers, mqtt, ge
 								<label>Hasło</label>
 								<input type="password" className="form-control" placeholder="hasło" onChange={e => setPassword(e.target.value)} />
 							</div>
-							<button type="submit" className="btn btn-primary">Zatwierdź</button>
+							<button type="submit" className="btn">Zatwierdź</button>
 						</form>
 					</div>
 					<div className='form'>
@@ -159,7 +159,7 @@ function Login({ setToken, setUser, setIsAdmin, active, setActiveUsers, mqtt, ge
 											</Field>
 											{formProps.touched.last_name && formProps.errors.last_name ? <div>{formProps.errors.last_name}</div> : null}
 										</div>
-										<button type="button" className="btn btn-primary" onClick={formProps.handleSubmit}>Zatwierdź</button>
+										<button type="button" className="btn" onClick={formProps.handleSubmit}>Zatwierdź</button>
 									</form>
 								)
 							}

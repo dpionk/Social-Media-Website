@@ -1,3 +1,31 @@
 @import "~bootstrap/scss/bootstrap";
 
+.settings {
+  border-radius: 20px;
+  padding:20px;
+  .list-group-item {
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+	align-items: center;
+    gap: 20px;
+    button {
+      background-color: #adc2a9;
+      color: white;
+	  height: 50%;
+    }
+  }
 
+  .form {
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    button {
+      background-color: #adc2a9;
+      color: white;
+    }
+  }
+}

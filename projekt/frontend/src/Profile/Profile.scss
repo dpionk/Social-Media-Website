@@ -1,5 +1,6 @@
 @import "~bootstrap/scss/bootstrap";
 
+
 .person {
   .list-group-detailed {
     display: flex;
@@ -33,7 +34,7 @@
               display: flex;
               flex-direction: column;
               gap: 20px;
-              border: 1px solid gray;
+              border: 1px solid #ADC2A9;
               border-radius: 20px;
               padding: 20px;
 
@@ -55,6 +56,15 @@
         flex-direction: column;
         gap: 10px;
         align-items: center;
+		button {
+			background-color: #ADC2A9;
+			color:white;
+		}
+		form {
+			button {
+				background-color: #ADC2A9;
+			}
+		}
 
         img {
           height: 300px;
@@ -72,7 +82,7 @@
           flex-direction: row-reverse;
           gap: 20px;
           button {
-            background-color: $blue-300;
+            background-color: #ADC2A9;
             color: white;
 
             &:hover {
@@ -93,7 +103,7 @@
             }
             .button-back {
               button {
-                background-color: $blue-300;
+                background-color: #ADC2A9;
                 color: white;
               }
             }

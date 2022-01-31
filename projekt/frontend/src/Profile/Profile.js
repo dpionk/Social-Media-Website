@@ -140,7 +140,7 @@ function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 													</Field>
 													{formProps.touched.picture && formProps.errors.picture ? <div>{formProps.errors.picture}</div> : null}
 												</div>
-												<button type="button" className="btn btn-primary" onClick={formProps.handleSubmit}>Zatwierdź</button>
+												<button type="button" className="btn" onClick={formProps.handleSubmit}>Zatwierdź</button>
 											</form>
 										)
 									}
