@@ -5,7 +5,7 @@ import axios from 'axios';
 import './Navbar.scss'
 
 
-function Navbar({ user, mqtt, setActiveUsers }) {
+function Navbar({ user, mqtt, setActiveUsers, logout }) {
 
 	const history = useNavigate();
 	const [clicked, setClicked] = useState(false);
@@ -46,20 +46,7 @@ function Navbar({ user, mqtt, setActiveUsers }) {
 		setUsername('')
 	}
 
-	const logout = () => {
-		axios.delete(`http://localhost:5000/users/active/${user}`).then(() => {
-			mqtt.publish("logout", JSON.stringify(user));
-			localStorage.clear();
-			Cookies.remove('token')
-			Cookies.remove('user')
-			Cookies.remove('admin')
-			window.location.href = "/";
-		}).catch((error) => {
-			console.log(error)
-			alert('Coś poszło nie tak')
-		})
 
-	}
 	return (
 		<div>
 			<nav className='navbar navbar-expand-lg navbar-light sticky-top'>

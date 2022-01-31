@@ -43,7 +43,6 @@ function Main({ user, activeUsers, mqtt }) {
 
 	}, [mqtt]);
 
-	console.log(newestPosts)
 
 
 	const handleValidate = (values) => {

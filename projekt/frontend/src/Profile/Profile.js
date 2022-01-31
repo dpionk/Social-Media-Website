@@ -44,7 +44,7 @@ function Profile({ userSession, isAdmin, mqtt, setActiveUsers }) {
 
 	}, [mqtt, setActiveUsers]);
 
-	console.log(posts)
+
 	const logout = () => {
 		axios.delete(`http://localhost:5000/users/active/${user.user_id}`).then(() => {
 			mqtt.publish("logout", JSON.stringify(user.user_id));
