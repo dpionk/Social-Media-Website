@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -7,8 +7,9 @@ import './Navbar.scss'
 
 function Navbar({ user, mqtt, setActiveUsers }) {
 
+	const history = useNavigate();
 	const [clicked, setClicked] = useState(false);
-
+	const [username, setUsername] = useState('')
 
 	useEffect(() => {
 
@@ -36,6 +37,13 @@ function Navbar({ user, mqtt, setActiveUsers }) {
 		setClicked(
 			!clicked
 		)
+	}
+
+	
+	const handleSubmit=  e => {
+		e.preventDefault();
+		history(`/users/search/${username}`)
+		setUsername('')
 	}
 
 	const logout = () => {
@@ -96,9 +104,9 @@ function Navbar({ user, mqtt, setActiveUsers }) {
 
 						</ul>
 						<div className='search'>
-							<form className="form-inline">
-								<input className="form-control mr-sm-2" type="search" placeholder="wyszukaj użytkownika..." aria-label="Search" />
-								<button className="btn btn-outline-success my-2 my-sm-0" type="button">szukaj</button>
+							<form className="form-inline" onSubmit={handleSubmit}>
+								<input value={username} className="form-control mr-sm-2" type="search" placeholder="wyszukaj użytkownika..." aria-label="Search" onChange={e => setUsername(e.target.value)} />
+								<button className="btn btn-outline-success my-2 my-sm-0" type="submit" >szukaj</button>
 							</form>
 						</div>
 					</div>

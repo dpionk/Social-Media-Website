@@ -1,0 +1,31 @@
+@import "~bootstrap/scss/bootstrap";
+
+
+.regex {
+	border-radius: 20px;
+	padding:20px;
+
+	.list-group-item {
+		display:flex;
+		flex-direction: column;
+		gap:20px;
+		padding:10px;
+		.user {
+			border-radius: 20px;
+			padding:10px;
+			border: 1px solid gray;
+			display:flex;
+			gap:10px; 
+			font-weight: bold;
+			font-style: italic;
+			align-items: center;
+			font-size: 1.5em;
+			img {
+				width:70px;
+				height: 70px;
+				border-radius: 50%;
+			}
+		}
+	}
+}
+

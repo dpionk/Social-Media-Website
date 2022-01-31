@@ -24,6 +24,13 @@ router.get('/active', async (req, res) => {
     return res.send(users.rows);
 });
 
+router.get('/matches/:regex', async (req, res) => {
+	const regex = req.params.regex
+	
+    const users = await client.query(`SELECT user_id, username, picture, REGEXP_MATCHES(username,'${regex}') FROM users`);
+    return res.send(users.rows);
+});
+
 
 router.delete('/active/:id', async  (req, res) => {
 	const id = req.params.id;
