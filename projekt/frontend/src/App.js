@@ -75,8 +75,9 @@ function App() {
 	}, []);
 
 	const logout = () => {
+		mqtt.publish("logout", JSON.stringify(user));
 		axios.delete(`http://localhost:5000/users/active/${user}`).then(() => {
-			mqtt.publish("logout", JSON.stringify(user));
+			
 			Cookies.remove('token')
 			Cookies.remove('user')
 			setUser(null)
@@ -105,7 +106,7 @@ function App() {
 						<Route exact path='/' element={<Main user={user} mqtt={mqtt} activeUsers={activeUsers} />}></Route>
 						<Route exact path='/chatrooms' element={<Chatrooms user={user} mqtt={mqtt} />}></Route>
 						<Route exact path='/posts/:id' element={<Post user={user} mqtt={mqtt} isAdmin={isAdmin} />}></Route>
-						<Route exact path='/settings' element={<Settings user={user} mqtt={mqtt} />}></Route>
+						<Route exact path='/settings' element={<Settings user={user} mqtt={mqtt} logout={logout}/>}></Route>
 						<Route exact path='/users/search/:regex' element={<Search />}></Route>
 						<Route path='*' element={<PageNotFound />} />
 					</Routes>

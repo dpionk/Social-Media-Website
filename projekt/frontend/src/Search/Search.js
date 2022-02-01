@@ -11,11 +11,17 @@ function Search() {
 	useEffect(() => {
 
 		axios.get(`http://localhost:5000/users/matches/${regex}`).then((response) => {
-			setUsers(response.data)
+			setUsers(response.data.reduce((prev, curr) => {
+				if (prev.find((user) => {return user.username === curr.username})) {
+					return prev;
+				}
+				return [ ...prev, curr]
+			}, []))
 		}).catch(error => {
 			console.log(error)
 		})
 	}, [regex]);
+
 
 	return (
 		<div className='regex'>

@@ -46,7 +46,6 @@ function Navbar({ user, mqtt, setActiveUsers, logout }) {
 		setUsername('')
 	}
 
-
 	return (
 		<div>
 			<nav className='navbar navbar-expand-lg navbar-light sticky-top'>

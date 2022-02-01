@@ -81,14 +81,16 @@ function Main({ user, activeUsers, mqtt }) {
 					<Formik
 						enableReinitialize
 						validate={handleValidate}
-						onSubmit={(values, {resetForm} ) => {handleSubmit(values); resetForm(
-							{
-								title: '',
-								release_date: '',
-								post_content: '',
-								creator: user,
-							}
-						)}}
+						onSubmit={(values, { resetForm }) => {
+							handleSubmit(values); resetForm(
+								{
+									title: '',
+									release_date: '',
+									post_content: '',
+									creator: user,
+								}
+							)
+						}}
 						initialValues={
 							{
 								title: '',
@@ -125,15 +127,20 @@ function Main({ user, activeUsers, mqtt }) {
 				<div className='activeUsers list-group-item'>
 					<h4>Aktywni użytkownicy</h4>
 					<div className='users-list'>
-						{activeUsers.length !== 0 && activeUsers.map((user) => {
+						{activeUsers.length !== 0 && activeUsers.reduce((prev, curr) => {
+							if (prev.find((user) => { return user.username === curr.username })) {
+								return prev;
+							}
+							return [...prev, curr]
+						}, []).map((user) => {
 							return (
 								<div className='active-user' key={user.user_id}>
 									<div className='active' />
-									<div className='user'><Link style={{ textDecoration: 'none', color:'black'}} to={`/users/${user.user_id}`}>{user.username}</Link></div>
+									<div className='user'><Link style={{ textDecoration: 'none', color: 'black' }} to={`/users/${user.user_id}`}>{user.username}</Link></div>
 								</div>
 							)
 						})
-					}
+						}
 					</div>
 				</div>
 				<div className='feed list-group-item'>
@@ -143,8 +150,8 @@ function Main({ user, activeUsers, mqtt }) {
 							return (
 								<div className='active-user' key={post.post_id}>
 									<div className='user'>
-									<img src={post.picture ? post.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
-										<Link style={{ textDecoration: 'none', color:'black'}} to={`/posts/${post.post_id}`}>{post.title}</Link>
+										<img src={post.picture ? post.picture : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} alt='user' />
+										<Link style={{ textDecoration: 'none', color: 'black' }} to={`/posts/${post.post_id}`}>{post.title}</Link>
 									</div>
 								</div>
 							)

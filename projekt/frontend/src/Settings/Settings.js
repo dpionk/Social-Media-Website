@@ -3,25 +3,11 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import './Settings.scss'
 
-function Settings({ user, mqtt }) {
+function Settings({ user, mqtt, logout }) {
 
 
-	const logout = () => {
-		axios.delete(`http://localhost:5000/users/active/${user}`).then(() => {
-			mqtt.publish("logout", JSON.stringify(user));
-			localStorage.clear();
-			Cookies.remove('token')
-			Cookies.remove('user')
-			Cookies.remove('admin')
-			window.location.href = "/";
-		}).catch((error) => {
-			console.log(error)
-			alert('Coś poszło nie tak')
-		})
-
-	}
 	const deleteUser = async () => {
-		await logout(user);
+		await logout();
 		axios.delete(`http://localhost:5000/users/${user}`).then(async () => {
 
 			alert('Usunięto profil :(')
